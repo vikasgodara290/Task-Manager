@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CiEdit } from "react-icons/ci";
 import { LuCheck } from "react-icons/lu";
 
 export default function Card() {
   const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [isEditTask, setIsEditTask] = useState<any>("false");
+  const editTaskRef = useRef<HTMLDivElement|null>(null);
 
   const onClickHandlerLuCheck = ()=>{
     isChecked? setIsChecked(false) :setIsChecked(true);
+  }
+
+  const handleEditTask = () =>{
+    setIsEditTask("true");
+    editTaskRef.current?.focus();
   }
 
   const uncheckedStyle = isChecked? 'border-green-300 bg-green-300 ' : 'border-gray-400 hidden ' ;
@@ -28,11 +35,15 @@ export default function Card() {
         <div
           id="task"
           className="flex flex-nowrap ml-1 mr-2 group hover:cursor-pointer hover:transform hover:translate-x-0.5 transition-transform duration-700"
+          tabIndex={1}
+          ref={editTaskRef}
+          contentEditable={isEditTask}
         >
           Add New Feature Ad New Feature Add New Feature Ad New Feature
         </div>
         <div
           className="ml-auto text-[18px] mr-1 hover:cursor-pointer"
+          onClick={handleEditTask}
         >
           <CiEdit />
         </div>
