@@ -13,9 +13,10 @@ const Card = () => {
           </div>
         </div>
         {/*Task Component*/}
-        <Task />
-        <Task />
-        <Task />
+        <Task task="add to-do list feature in dashboard"/>
+        <Task task="add auth to application"/>
+        <Task task="add profile page in app"/>
+        <Task task="implement logout feature in app. also prepare UI for logout function"/>
         {/*Add a Card Component*/}
         <AddCard />
       </div>

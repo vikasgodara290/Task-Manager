@@ -1,26 +1,23 @@
-import {useState} from 'react';
 import { LuCheck } from "react-icons/lu";
 
-const Status = () => {
-  const [isChecked, setIsChecked] = useState<boolean>(false);
+interface StatusProps {
+    isChecked : boolean | null,
+    onClickHandlerLuCheck : any
+}
+const Status = ({isChecked, onClickHandlerLuCheck} : StatusProps) => {
 
   const uncheckedStyle = isChecked
     ? "border-green-300 bg-green-300 "
-    : "border-gray-400 hidden ";
+    : "border-gray-400 hidden";
   const checkedStyle = isChecked ? "block " : "hidden ";
-
-  const onClickHandlerLuCheck = ()=>{
-    isChecked? setIsChecked(false) :setIsChecked(true);
-  }
 
   return (
     <>
       <div
-        className={`${uncheckedStyle}mr-1.5 mt-[1px] h-4 w-9 rounded-full
-            text-[12px] group-hover:block border-2`}
+        className={`${uncheckedStyle} h-[16px] w-[16px] rounded-full border-2 group-hover:block`}
         onClick={onClickHandlerLuCheck}
       >
-        <span className={`${checkedStyle}text-black`}>
+        <span className={`${checkedStyle}text-black text-[12px]`}>
           <LuCheck />
         </span>
       </div>

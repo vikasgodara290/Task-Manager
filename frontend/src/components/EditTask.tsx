@@ -16,7 +16,7 @@ const EditTask = ({ editTaskRef }: EditTaskProps) => {
   return (
     <>
       <div
-        className="ml-auto text-[18px] mr-1 hover:cursor-pointer"
+        className="text-[18px] hover:cursor-pointer"
         onClick={handleEditTask}
       >
         <CiEdit />
