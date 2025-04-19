@@ -1,25 +1,26 @@
-import { useRef } from "react";
-import Status from "./Status";
-import EditTask from "./EditTask";
+import AddCard from "./AddCard";
+import Task from "./Task";
+import { BsThreeDots } from "react-icons/bs";
 
-export default function Card() {
-  const editTaskRef = useRef<HTMLDivElement | null>(null);
-
+const Card = () => {
   return (
     <>
-      <div className="group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor flex px-1 py-2  mx-auto items-center text-[12px] my-2">
-        <Status />
-        <div
-          id="task"
-          className="flex flex-nowrap ml-1 mr-2 group hover:cursor-pointer hover:transform hover:translate-x-0.5 transition-transform duration-700"
-          tabIndex={1}
-          ref={editTaskRef}
-        >
-          Add New Feature Ad New Feature Add New Feature Ad New Feature
+      <div className="bg-black rounded-[12px] w-60 h-min m-10">
+        <div className="text-txtColor font-medium flex justify-between px-4 h-9 text-[16px] items-center">
+          <span>To Do</span>
+          <div className="">
+            <BsThreeDots />
+          </div>
         </div>
-
-        <EditTask editTaskRef={editTaskRef} />
+        {/*Task Component*/}
+        <Task />
+        <Task />
+        <Task />
+        {/*Add a Card Component*/}
+        <AddCard />
       </div>
     </>
   );
-}
+};
+
+export default Card;
