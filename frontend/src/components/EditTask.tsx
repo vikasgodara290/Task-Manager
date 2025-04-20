@@ -2,15 +2,15 @@
 import { CiEdit } from "react-icons/ci";
 
 interface EditTaskProps {
-  editTaskRef: React.RefObject<HTMLDivElement | null>;
+  setIsEditTask: React.Dispatch<React.SetStateAction<boolean>>;
+  task: string;
 }
 
-const EditTask = ({ editTaskRef }: EditTaskProps) => {
+const EditTask = ({ setIsEditTask }: EditTaskProps) => {
   //const [isEditTask, setIsEditTask] = useState<string>("false");
 
   const handleEditTask = () => {
-    //setIsEditTask("true");
-    editTaskRef.current?.focus();
+    setIsEditTask(true);
   };
 
   return (

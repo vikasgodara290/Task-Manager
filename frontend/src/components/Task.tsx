@@ -1,39 +1,72 @@
-import { useRef, useState} from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Status from "./Status";
 import EditTask from "./EditTask";
 
 interface TaskProps {
-  task : string
+  task: string;
 }
-export default function Task({task} : TaskProps) {
-  const editTaskRef = useRef<HTMLDivElement | null>(null);
+export default function Task({ task }: TaskProps) {
+  const editTaskRef = useRef<HTMLTextAreaElement | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [isEditTask, setIsEditTask] = useState<boolean>(false);
 
-  const onClickHandlerLuCheck = ()=>{
-    isChecked? setIsChecked(false) :setIsChecked(true);
-  }
+  const onClickHandlerLuCheck = () => {
+    isChecked ? setIsChecked(false) : setIsChecked(true);
+  };
 
-  let taskStyle= isChecked? "pr-1" : "pr-5";
+  const handleOnInputTask = (e: FormEvent<HTMLTextAreaElement>) => {
+    (e.target as HTMLTextAreaElement).style.height = "auto"; // Reset the height
+    (e.target as HTMLTextAreaElement).style.height = `${
+      (e.target as HTMLTextAreaElement).scrollHeight
+    }px`; // Set new height based on content
+  };
+
+  let taskStyle = isChecked ? "pr-1" : "pr-5";
+
+  useEffect(() => {
+    if (isEditTask && editTaskRef.current) {
+      console.log(editTaskRef.current);
+      editTaskRef.current?.focus();
+      const length = editTaskRef.current.value.length;
+      editTaskRef.current.setSelectionRange(length, length);
+    }
+  }, [isEditTask]);
 
   return (
     <>
       <div className="flex items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-2">
         <span className="mt-2.5 mx-1 shrink-0">
-          <Status isChecked={isChecked} onClickHandlerLuCheck={onClickHandlerLuCheck}/>
+          <Status
+            isChecked={isChecked}
+            onClickHandlerLuCheck={onClickHandlerLuCheck}
+          />
         </span>
-        
+
         <div
           id="task"
-          className={`pl-1 ${taskStyle} group-hover:pr-1 py-2 hover:cursor-pointer hover:transform hover:translate-x-0.5 transition-transform duration-700 text-[12px]`}
-          ref={editTaskRef}
+          className={`pl-1 ${taskStyle} w-full group-hover:pr-1 py-2 hover:cursor-pointer hover:transform hover:translate-x-0.5 transition-transform duration-700 text-[12px]`}
         >
-          {task}
+          {isEditTask ? (
+            <textarea
+              ref={editTaskRef}
+              className="w-full h-auto overflow-hidden outline-none resize-none p-0 m-0 bg-transparent text-inherit font-inherit"
+              defaultValue={task}
+              onInput={(e) => handleOnInputTask(e)}
+              onFocus={(e) => {
+                (e.target as HTMLTextAreaElement).style.height = "auto"; // Reset the height
+                (e.target as HTMLTextAreaElement).style.height = `${
+                  (e.target as HTMLTextAreaElement).scrollHeight
+                }px`; // Set new height based on content
+              }}
+            ></textarea>
+          ) : (
+            task
+          )}
         </div>
 
         <span className="ml-auto mx-1 mt-2">
-          <EditTask editTaskRef={editTaskRef} />
+          <EditTask task={task} setIsEditTask={setIsEditTask} />
         </span>
-        
       </div>
     </>
   );
