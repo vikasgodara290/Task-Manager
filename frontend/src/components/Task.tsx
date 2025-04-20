@@ -9,6 +9,7 @@ export default function Task({ task }: TaskProps) {
   const editTaskRef = useRef<HTMLTextAreaElement | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [isEditTask, setIsEditTask] = useState<boolean>(false);
+  const [editedTask, setEditedTask] = useState<string>(task);
 
   const onClickHandlerLuCheck = () => {
     isChecked ? setIsChecked(false) : setIsChecked(true);
@@ -20,6 +21,14 @@ export default function Task({ task }: TaskProps) {
       (e.target as HTMLTextAreaElement).scrollHeight
     }px`; // Set new height based on content
   };
+
+  const handleSaveTask = () => {
+    console.log(editTaskRef.current?.value);
+    if(editTaskRef.current){
+      setEditedTask(editTaskRef.current?.value);
+      setIsEditTask(false);
+    }
+  }
 
   let taskStyle = isChecked ? "pr-1" : "pr-5";
 
@@ -47,10 +56,11 @@ export default function Task({ task }: TaskProps) {
           className={`pl-1 ${taskStyle} w-full group-hover:pr-1 py-2 hover:cursor-pointer hover:transform hover:translate-x-0.5 transition-transform duration-700 text-[12px]`}
         >
           {isEditTask ? (
+            <>
             <textarea
               ref={editTaskRef}
               className="w-full h-auto overflow-hidden outline-none resize-none p-0 m-0 bg-transparent text-inherit font-inherit"
-              defaultValue={task}
+              defaultValue={editedTask}
               onInput={(e) => handleOnInputTask(e)}
               onFocus={(e) => {
                 (e.target as HTMLTextAreaElement).style.height = "auto"; // Reset the height
@@ -58,9 +68,14 @@ export default function Task({ task }: TaskProps) {
                   (e.target as HTMLTextAreaElement).scrollHeight
                 }px`; // Set new height based on content
               }}
+              onKeyDown={(e)=> e.key === "Enter" && handleSaveTask()}
             ></textarea>
+            <button className="bg-blue-400 text-black px-2 py-1 rounded-[6px] hover:cursor-pointer" 
+            onClick={handleSaveTask}
+            >SAVE</button>
+            </>
           ) : (
-            task
+            editedTask? editedTask : "Loading..."
           )}
         </div>
 
