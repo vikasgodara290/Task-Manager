@@ -9,19 +9,24 @@ interface TaskProps {
   setIsAddNewTask: any;
   isAddNewTask: boolean;
 }
-export default function Task({ task, setTask , taskList, setIsAddNewTask, isAddNewTask}: TaskProps) {
+export default function Task({
+  task,
+  setTask,
+  taskList,
+  setIsAddNewTask,
+  isAddNewTask,
+}: TaskProps) {
   const editTaskRef = useRef<HTMLTextAreaElement | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [isEditTask, setIsEditTask] = useState<boolean>(false);
   const [editedTask, setEditedTask] = useState<string>(task);
 
-  useEffect(()=>{
-    if(!editedTask){
+  useEffect(() => {
+    if (!editedTask) {
       setIsEditTask(true);
       setIsAddNewTask(true);
     }
-  },[])
-
+  }, []);
 
   const onClickHandlerLuCheck = () => {
     isChecked ? setIsChecked(false) : setIsChecked(true);
@@ -35,11 +40,14 @@ export default function Task({ task, setTask , taskList, setIsAddNewTask, isAddN
   };
 
   const handleSaveTask = () => {
-    if(isAddNewTask){
-      setTask([...taskList, {
-        id: taskList.length,
-        task: editTaskRef.current?.value
-      }])
+    if (isAddNewTask) {
+      setTask([
+        ...taskList,
+        {
+          id: taskList.length,
+          task: editTaskRef.current?.value,
+        },
+      ]);
       setIsAddNewTask(false);
       setIsEditTask(false);
       return;
@@ -104,10 +112,11 @@ export default function Task({ task, setTask , taskList, setIsAddNewTask, isAddN
           )}
         </div>
 
-        {!isAddNewTask &&
+        {!isAddNewTask && (
           <span className="ml-auto mx-1 mt-2">
-          <EditTask task={task} setIsEditTask={setIsEditTask} />
-        </span>}
+            <EditTask task={task} setIsEditTask={setIsEditTask} />
+          </span>
+        )}
       </div>
     </>
   );

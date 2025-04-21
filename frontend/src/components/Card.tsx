@@ -7,7 +7,7 @@ const Card = () => {
   const [isAddNewTask, setIsAddNewTask] = useState<boolean>(false);
   const [task, setTask] = useState([
     {
-      id : 1,
+      id: 1,
       task: "add to-do list feature in dashboard",
     },
     {
@@ -15,15 +15,14 @@ const Card = () => {
       task: "add auth to application",
     },
     {
-      id : 3,
+      id: 3,
       task: "implement logout feature in app. also prepare UI for logout function",
     },
   ]);
-console.log(isAddNewTask);
 
   return (
     <>
-      <div className="bg-black rounded-[12px] w-60 h-min m-10">
+      <div className="bg-black rounded-[12px] w-60 h-min m-4">
         <div className="text-txtColor font-medium flex justify-between px-4 h-9 text-[16px] items-center">
           <span>To Do</span>
           <div className="">
@@ -34,12 +33,28 @@ console.log(isAddNewTask);
         {task.map((task) => {
           return (
             <>
-              <Task key={task.id} task={task.task} setTask={setTask} taskList = {task} setIsAddNewTask={setIsAddNewTask} isAddNewTask={isAddNewTask}/>
+              <Task
+                key={task.id}
+                task={task.task}
+                setTask={setTask}
+                taskList={task}
+                setIsAddNewTask={setIsAddNewTask}
+                isAddNewTask={isAddNewTask}
+              />
             </>
           );
         })}
 
-        {isAddNewTask && <Task key={3423} task="" setTask={setTask} taskList = {task} setIsAddNewTask={setIsAddNewTask} isAddNewTask={isAddNewTask}/>}
+        {isAddNewTask && (
+          <Task
+            key={3423}
+            task=""
+            setTask={setTask}
+            taskList={task}
+            setIsAddNewTask={setIsAddNewTask}
+            isAddNewTask={isAddNewTask}
+          />
+        )}
         {/*Add a Card Component*/}
         <AddCard setIsAddNewTask={setIsAddNewTask} />
       </div>

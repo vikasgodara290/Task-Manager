@@ -1,11 +1,10 @@
 import { LuCheck } from "react-icons/lu";
 
 interface StatusProps {
-    isChecked : boolean | null,
-    onClickHandlerLuCheck : any
+  isChecked: boolean | null;
+  onClickHandlerLuCheck: any;
 }
-const Status = ({isChecked, onClickHandlerLuCheck} : StatusProps) => {
-
+const Status = ({ isChecked, onClickHandlerLuCheck }: StatusProps) => {
   const uncheckedStyle = isChecked
     ? "border-green-300 bg-green-300 "
     : "border-gray-400 hidden";
