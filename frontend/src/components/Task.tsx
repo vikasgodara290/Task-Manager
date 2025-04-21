@@ -4,12 +4,24 @@ import EditTask from "./EditTask";
 
 interface TaskProps {
   task: string;
+  setTask: any;
+  taskList: any;
+  setIsAddNewTask: any;
+  isAddNewTask: boolean;
 }
-export default function Task({ task }: TaskProps) {
+export default function Task({ task, setTask , taskList, setIsAddNewTask, isAddNewTask}: TaskProps) {
   const editTaskRef = useRef<HTMLTextAreaElement | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [isEditTask, setIsEditTask] = useState<boolean>(false);
   const [editedTask, setEditedTask] = useState<string>(task);
+
+  useEffect(()=>{
+    if(!editedTask){
+      setIsEditTask(true);
+      setIsAddNewTask(true);
+    }
+  },[])
+
 
   const onClickHandlerLuCheck = () => {
     isChecked ? setIsChecked(false) : setIsChecked(true);
@@ -23,18 +35,26 @@ export default function Task({ task }: TaskProps) {
   };
 
   const handleSaveTask = () => {
-    console.log(editTaskRef.current?.value);
-    if(editTaskRef.current){
+    if(isAddNewTask){
+      setTask([...taskList, {
+        id: taskList.length,
+        task: editTaskRef.current?.value
+      }])
+      setIsAddNewTask(false);
+      setIsEditTask(false);
+      return;
+    }
+    if (editTaskRef.current) {
       setEditedTask(editTaskRef.current?.value);
       setIsEditTask(false);
+      setIsAddNewTask(false);
     }
-  }
+  };
 
   let taskStyle = isChecked ? "pr-1" : "pr-5";
 
   useEffect(() => {
     if (isEditTask && editTaskRef.current) {
-      console.log(editTaskRef.current);
       editTaskRef.current?.focus();
       const length = editTaskRef.current.value.length;
       editTaskRef.current.setSelectionRange(length, length);
@@ -57,31 +77,37 @@ export default function Task({ task }: TaskProps) {
         >
           {isEditTask ? (
             <>
-            <textarea
-              ref={editTaskRef}
-              className="w-full h-auto overflow-hidden outline-none resize-none p-0 m-0 bg-transparent text-inherit font-inherit"
-              defaultValue={editedTask}
-              onInput={(e) => handleOnInputTask(e)}
-              onFocus={(e) => {
-                (e.target as HTMLTextAreaElement).style.height = "auto"; // Reset the height
-                (e.target as HTMLTextAreaElement).style.height = `${
-                  (e.target as HTMLTextAreaElement).scrollHeight
-                }px`; // Set new height based on content
-              }}
-              onKeyDown={(e)=> e.key === "Enter" && handleSaveTask()}
-            ></textarea>
-            <button className="bg-blue-400 text-black px-2 py-1 rounded-[6px] hover:cursor-pointer" 
-            onClick={handleSaveTask}
-            >SAVE</button>
+              <textarea
+                ref={editTaskRef}
+                className="w-full h-auto overflow-hidden outline-none resize-none p-0 m-0 bg-transparent text-inherit font-inherit"
+                defaultValue={editedTask}
+                onInput={(e) => handleOnInputTask(e)}
+                onFocus={(e) => {
+                  (e.target as HTMLTextAreaElement).style.height = "auto"; // Reset the height
+                  (e.target as HTMLTextAreaElement).style.height = `${
+                    (e.target as HTMLTextAreaElement).scrollHeight
+                  }px`; // Set new height based on content
+                }}
+                onKeyDown={(e) => e.key === "Enter" && handleSaveTask()}
+              ></textarea>
+              <button
+                className="bg-blue-400 text-black px-2 py-1 rounded-[6px] hover:cursor-pointer"
+                onClick={handleSaveTask}
+              >
+                SAVE
+              </button>
             </>
+          ) : editedTask ? (
+            editedTask
           ) : (
-            editedTask? editedTask : "Loading..."
+            ""
           )}
         </div>
 
-        <span className="ml-auto mx-1 mt-2">
+        {!isAddNewTask &&
+          <span className="ml-auto mx-1 mt-2">
           <EditTask task={task} setIsEditTask={setIsEditTask} />
-        </span>
+        </span>}
       </div>
     </>
   );
