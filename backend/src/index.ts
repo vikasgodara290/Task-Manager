@@ -19,8 +19,9 @@ Task model/object
 let Tasks = [
     {
         id: 1,
-        Desc: "Go To Gym",
-        Status: "Todo",
+        Task: "Go To Gym",
+        CardId: 990,
+        isDone: false,
         Assignee: 111,
         CreatedOn: "07-Apr-2025 6:00 PM",
         CreatedBy: 100,
@@ -29,8 +30,9 @@ let Tasks = [
     },
     {
         id: 2,
-        Desc: "Complete Project Report",
-        Status: "Doing",
+        Task: "Complete Project Report",
+        CardId: 991,
+        isDone: false,
         Assignee: 112,
         CreatedOn: "06-Apr-2025 10:00 AM",
         CreatedBy: 100,
@@ -39,8 +41,9 @@ let Tasks = [
     },
     {
         id: 3,
-        Desc: "Prepare Presentation",
-        Status: "Done",
+        Task: "Prepare Presentation",
+        CardId: 992,
+        isDone: true,
         Assignee: 113,
         CreatedOn: "05-Apr-2025 2:00 PM",
         CreatedBy: 100,
@@ -76,20 +79,21 @@ app.get('/task', (req, res)=>{
     res.json(Tasks)
 });
 
-app.get('/taskById', (req, res)=>{
-    const id = req.body.id;
+app.get('/taskById/:id', (req, res)=>{
+    const id = Number( req.params.id );
     res.json(Tasks.filter(tasks => tasks.id == id))
 })
 
 app.post('/task', (req, res)=>{
     const id = Tasks.length + 1;
-    const {desc, status, assignee, createdBy} = req.body;
+    const {task, cardId, isDone, assignee, createdBy} = req.body;
 
     // Create a new task object
     const newTask = {
         id,
-        Desc: desc,
-        Status: status || "Todo", // Default status to "Todo" if not provided
+        Task: task,
+        CardId: cardId,
+        isDone: isDone, // Default status to "Todo" if not provided
         Assignee: assignee,
         CreatedOn: new Date().toLocaleString(), // Set current date and time
         CreatedBy: createdBy,
@@ -111,7 +115,7 @@ app.delete('/task/:id', (req, res)=>{
 //edit a task
 app.put('/task', (req, res) => {
     // Extract data from the request body
-    const { id, desc, status, assignee, modifiedBy } = req.body; 
+    const { id, task, cardId, isDone, assignee, modifiedBy } = req.body; 
     // Find the task by ID
     const taskIndex = Tasks.findIndex(task => task.id === parseInt(id, 10));
 
@@ -124,8 +128,9 @@ app.put('/task', (req, res) => {
     // Update the task properties
     Tasks[taskIndex] = {
         ...Tasks[taskIndex], // Keep existing properties
-        Desc: desc || Tasks[taskIndex].Desc, // Update only if provided
-        Status: status || Tasks[taskIndex].Status,
+        Task: task || Tasks[taskIndex].Task, // Update only if provided
+        CardId: cardId || Tasks[taskIndex].CardId,
+        isDone: isDone || Tasks[taskIndex].isDone,
         Assignee: assignee || Tasks[taskIndex].Assignee,
         ModifiedOn: new Date().toLocaleString(), // Set the current date and time
         ModifiedBy: modifiedBy || Tasks[taskIndex].ModifiedBy
@@ -138,5 +143,3 @@ app.put('/task', (req, res) => {
 app.listen(PORT, ()=>{
     console.log(`task manager app's backend is listening to PORT ${PORT}`);
 });
-
-

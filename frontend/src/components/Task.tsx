@@ -1,17 +1,21 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Status from "./Status";
 import EditTask from "./EditTask";
+import axios from "axios";
+const URL = import.meta.env.VITE_URL;
 
 interface TaskProps {
+  taskId : number;
   task: string;
-  setTask: any;
+  setTasks: any;
   taskList: any;
   setIsAddNewTask: any;
   isAddNewTask: boolean;
 }
 export default function Task({
+  taskId,
   task,
-  setTask,
+  setTasks,
   taskList,
   setIsAddNewTask,
   isAddNewTask,
@@ -20,6 +24,8 @@ export default function Task({
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [isEditTask, setIsEditTask] = useState<boolean>(false);
   const [editedTask, setEditedTask] = useState<string>(task);
+
+console.log('task',task);
 
   useEffect(() => {
     if (!editedTask) {
@@ -39,21 +45,41 @@ export default function Task({
     }px`; // Set new height based on content
   };
 
-  const handleSaveTask = () => {
+  const handleSaveTask = async () => {
     if (isAddNewTask) {
-      setTask([
+      //task, cardId, isDone, assignee, createdBy
+      const res = await axios.post(`${URL}task`,{
+        task: editTaskRef.current?.value,
+        cardId: 993,
+        isDone: false,
+        assignee: 111,
+        createdBy: 110
+      })
+      const newTask = res.data;
+      setTasks([
         ...taskList,
-        {
-          id: taskList.length,
-          task: editTaskRef.current?.value,
-        },
+        newTask
       ]);
       setIsAddNewTask(false);
       setIsEditTask(false);
       return;
     }
     if (editTaskRef.current) {
-      setEditedTask(editTaskRef.current?.value);
+//    "id": 1,task,cardId: 990,"isDone": false,"assignee": 111,"modifiedBy": ""
+console.log(editTaskRef.current.id);
+
+      const res = await axios.put(`${URL}task`,{
+        id: Number(editTaskRef.current.id),
+        task: editTaskRef.current?.value,
+        cardId: 993,
+        isDone: false,
+        assignee: 111,
+        modifiedBy: ""
+      })
+      const editedTask = res.data;
+      console.log(editedTask);
+      
+      setEditedTask(editedTask.Task);
       setIsEditTask(false);
       setIsAddNewTask(false);
     }
@@ -80,12 +106,12 @@ export default function Task({
         </span>
 
         <div
-          id="task"
           className={`pl-1 ${taskStyle} w-full group-hover:pr-1 py-2 hover:cursor-pointer hover:transform hover:translate-x-0.5 transition-transform duration-700 text-[12px]`}
         >
           {isEditTask ? (
             <>
               <textarea
+                id={String (taskId)}
                 ref={editTaskRef}
                 className="w-full h-auto overflow-hidden outline-none resize-none p-0 m-0 bg-transparent text-inherit font-inherit"
                 defaultValue={editedTask}

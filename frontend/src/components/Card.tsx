@@ -3,22 +3,13 @@ import AddCard from "./AddCard";
 import Task from "./Task";
 import { BsThreeDots } from "react-icons/bs";
 
-const Card = () => {
+interface CardProps{
+  tasks : any;
+  setTasks : React.Dispatch<React.SetStateAction<any>>
+}
+
+const Card = ({tasks, setTasks}: CardProps) => {
   const [isAddNewTask, setIsAddNewTask] = useState<boolean>(false);
-  const [task, setTask] = useState([
-    {
-      id: 1,
-      task: "add to-do list feature in dashboard",
-    },
-    {
-      id: 2,
-      task: "add auth to application",
-    },
-    {
-      id: 3,
-      task: "implement logout feature in app. also prepare UI for logout function",
-    },
-  ]);
 
   return (
     <>
@@ -30,14 +21,17 @@ const Card = () => {
           </div>
         </div>
 
-        {task.map((task) => {
+        {tasks.map((task : any) => {
+          console.log('card',task.Task);
+          
           return (
             <>
               <Task
                 key={task.id}
-                task={task.task}
-                setTask={setTask}
-                taskList={task}
+                taskId={task.id}
+                task={task.Task}
+                setTasks={setTasks}
+                taskList={tasks}
                 setIsAddNewTask={setIsAddNewTask}
                 isAddNewTask={isAddNewTask}
               />
@@ -48,9 +42,10 @@ const Card = () => {
         {isAddNewTask && (
           <Task
             key={3423}
+            taskId={0}
             task=""
-            setTask={setTask}
-            taskList={task}
+            setTasks={setTasks}
+            taskList={tasks}
             setIsAddNewTask={setIsAddNewTask}
             isAddNewTask={isAddNewTask}
           />
