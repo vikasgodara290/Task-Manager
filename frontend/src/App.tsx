@@ -6,17 +6,16 @@ const URL = import.meta.env.VITE_URL;
 
 
 function App() {
-  const [tasks, setTasks] = useState<any>([]);
+  const [cards, setCards] = useState<any>([]);
 
   useEffect(
     () => {
-      //func which call itself
       (
-        //async func can't be declared inside a useEffect directly
+        //this function will get cards
         async ()=>{
-          let res = await axios.get(`${URL}task`);
+          let res = await axios.get(`${URL}card`);
           res = res.data;
-          setTasks(res);
+          setCards(res);
           console.log(res);
         }
       )();
@@ -25,9 +24,17 @@ function App() {
   )
   return (
     <>
-      <div className="flex flex-wrap ">
-        <Card tasks={tasks} setTasks={setTasks}/>
-      </div>
+    <div className="flex">
+      {       
+        cards.map((card : any) => {
+          return(
+            <>
+              <Card cardId={card.CardId} cardName={card.CardName}/>
+            </>
+          )
+        })       
+      }
+    </div>
     </>
   );
 }

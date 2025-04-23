@@ -7,6 +7,7 @@ const URL = import.meta.env.VITE_URL;
 interface TaskProps {
   taskId : number;
   task: string;
+  cardId: string;
   setTasks: any;
   taskList: any;
   setIsAddNewTask: any;
@@ -15,6 +16,7 @@ interface TaskProps {
 export default function Task({
   taskId,
   task,
+  cardId,
   setTasks,
   taskList,
   setIsAddNewTask,
@@ -50,7 +52,7 @@ console.log('task',task);
       //task, cardId, isDone, assignee, createdBy
       const res = await axios.post(`${URL}task`,{
         task: editTaskRef.current?.value,
-        cardId: 993,
+        cardId: cardId,
         isDone: false,
         assignee: 111,
         createdBy: 110
@@ -65,13 +67,13 @@ console.log('task',task);
       return;
     }
     if (editTaskRef.current) {
-//    "id": 1,task,cardId: 990,"isDone": false,"assignee": 111,"modifiedBy": ""
-console.log(editTaskRef.current.id);
+      //    "id": 1,task,cardId: 990,"isDone": false,"assignee": 111,"modifiedBy": ""
+      console.log(editTaskRef.current.id);
 
       const res = await axios.put(`${URL}task`,{
         id: Number(editTaskRef.current.id),
         task: editTaskRef.current?.value,
-        cardId: 993,
+        cardId: cardId,
         isDone: false,
         assignee: 111,
         modifiedBy: ""

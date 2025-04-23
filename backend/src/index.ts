@@ -16,6 +16,21 @@ Task model/object
     ModifiedOn
     ModifiedBy
 -------*/
+let Cards = [
+    {
+        CardId: 990,
+        CardName: "To Do"
+    },
+    {
+        CardId: 991,
+        CardName: "Doing"
+    },
+    {
+        CardId: 992,
+        CardName: "Done"
+    }
+];
+
 let Tasks = [
     {
         id: 1,
@@ -51,7 +66,6 @@ let Tasks = [
         ModifiedBy: 113
     }
 ];
-
 let Users = [
     {
         id: 100,
@@ -77,6 +91,10 @@ let Users = [
 
 app.get('/task', (req, res)=>{
     res.json(Tasks)
+});
+
+app.get('/card', (req, res)=>{
+    res.json(Cards)
 });
 
 app.get('/taskById/:id', (req, res)=>{
