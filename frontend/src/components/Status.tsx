@@ -1,14 +1,37 @@
+import { useEffect } from "react";
 import { LuCheck } from "react-icons/lu";
+import axios from "axios";
+const URL = import.meta.env.VITE_URL;
 
 interface StatusProps {
   isChecked: boolean | null;
-  onClickHandlerLuCheck: any;
+  isDone : boolean;
+  taskId: number;
+  setIsChecked: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const Status = ({ isChecked, onClickHandlerLuCheck }: StatusProps) => {
+const Status = ({isDone, isChecked, setIsChecked, taskId}: StatusProps) => {
+  console.log("this is from tatus: ",isDone);
+  
   const uncheckedStyle = isChecked
     ? "border-green-300 bg-green-300 "
     : "border-gray-400 hidden";
   const checkedStyle = isChecked ? "block " : "hidden ";
+
+  useEffect(()=>{
+    console.log("this is from status: ",isChecked);
+    (
+      async () => {
+        await axios.put(`${URL}task`,{
+          id: taskId,
+          isDone : isChecked
+        })
+      }
+    )();
+  },[isChecked])
+
+  const onClickHandlerLuCheck = () => {
+    isChecked ? setIsChecked(false) : setIsChecked(true);
+  };
 
   return (
     <>

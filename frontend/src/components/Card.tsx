@@ -47,8 +47,7 @@ const Card = ({ cardId, cardName}: CardProps) => {
               <Task
                 key={task.id}
                 cardId={cardId}
-                taskId={task.id}
-                task={task.Task}
+                task={task}
                 setTasks={setTasks}
                 taskList={tasks}
                 setIsAddNewTask={setIsAddNewTask}
@@ -61,9 +60,8 @@ const Card = ({ cardId, cardName}: CardProps) => {
         {isAddNewTask && (
           <Task
             key={3423}
-            taskId={0}
             cardId={cardId}
-            task=""
+            task={{id: 0, task: ""}}
             setTasks={setTasks}
             taskList={tasks}
             setIsAddNewTask={setIsAddNewTask}

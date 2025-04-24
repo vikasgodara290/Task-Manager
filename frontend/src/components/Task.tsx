@@ -5,8 +5,7 @@ import axios from "axios";
 const URL = import.meta.env.VITE_URL;
 
 interface TaskProps {
-  taskId : number;
-  task: string;
+  task: any;
   cardId: string;
   setTasks: any;
   taskList: any;
@@ -14,7 +13,6 @@ interface TaskProps {
   isAddNewTask: boolean;
 }
 export default function Task({
-  taskId,
   task,
   cardId,
   setTasks,
@@ -23,9 +21,11 @@ export default function Task({
   isAddNewTask,
 }: TaskProps) {
   const editTaskRef = useRef<HTMLTextAreaElement | null>(null);
-  const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [isChecked, setIsChecked] = useState<boolean>(task.isDone);
   const [isEditTask, setIsEditTask] = useState<boolean>(false);
-  const [editedTask, setEditedTask] = useState<string>(task);
+  const [editedTask, setEditedTask] = useState<string>(task.Task);
+  console.log("this is from task: ", task.Task, task);
+  
 
 console.log('task',task);
 
@@ -35,10 +35,6 @@ console.log('task',task);
       setIsAddNewTask(true);
     }
   }, []);
-
-  const onClickHandlerLuCheck = () => {
-    isChecked ? setIsChecked(false) : setIsChecked(true);
-  };
 
   const handleOnInputTask = (e: FormEvent<HTMLTextAreaElement>) => {
     (e.target as HTMLTextAreaElement).style.height = "auto"; // Reset the height
@@ -53,7 +49,7 @@ console.log('task',task);
       const res = await axios.post(`${URL}task`,{
         task: editTaskRef.current?.value,
         cardId: cardId,
-        isDone: false,
+        isDone: isChecked,
         assignee: 111,
         createdBy: 110
       })
@@ -74,7 +70,7 @@ console.log('task',task);
         id: Number(editTaskRef.current.id),
         task: editTaskRef.current?.value,
         cardId: cardId,
-        isDone: false,
+        isDone: isChecked,
         assignee: 111,
         modifiedBy: ""
       })
@@ -102,8 +98,10 @@ console.log('task',task);
       <div className="flex items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-2">
         <span className="mt-2.5 mx-1 shrink-0">
           <Status
+            taskId = {task.id}
+            isDone = {task.isDone}
             isChecked={isChecked}
-            onClickHandlerLuCheck={onClickHandlerLuCheck}
+            setIsChecked = {setIsChecked}
           />
         </span>
 
@@ -113,7 +111,7 @@ console.log('task',task);
           {isEditTask ? (
             <>
               <textarea
-                id={String (taskId)}
+                id={String (task.id)}
                 ref={editTaskRef}
                 className="w-full h-auto overflow-hidden outline-none resize-none p-0 m-0 bg-transparent text-inherit font-inherit"
                 defaultValue={editedTask}

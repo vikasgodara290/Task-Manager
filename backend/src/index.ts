@@ -135,6 +135,8 @@ app.put('/task', (req, res) => {
     // Extract data from the request body
     const { id, task, cardId, isDone, assignee, modifiedBy } = req.body; 
     // Find the task by ID
+    console.log(id, isDone);
+    
     const taskIndex = Tasks.findIndex(task => task.id === parseInt(id, 10));
 
     if (taskIndex === -1) {
@@ -142,14 +144,17 @@ app.put('/task', (req, res) => {
         res.status(404).json({ message: `Task with id ${id} not found.` });
         return;
     }
+console.log(taskIndex, Tasks[taskIndex], isDone);
 
     // Update the task properties
     Tasks[taskIndex] = {
-        ...Tasks[taskIndex], // Keep existing properties
+        id : id,
         Task: task || Tasks[taskIndex].Task, // Update only if provided
         CardId: cardId || Tasks[taskIndex].CardId,
-        isDone: isDone || Tasks[taskIndex].isDone,
+        isDone: isDone ?? Tasks[taskIndex].isDone,
         Assignee: assignee || Tasks[taskIndex].Assignee,
+        CreatedOn: Tasks[taskIndex].CreatedOn, // Set current date and time
+        CreatedBy: Tasks[taskIndex].CreatedBy,
         ModifiedOn: new Date().toLocaleString(), // Set the current date and time
         ModifiedBy: modifiedBy || Tasks[taskIndex].ModifiedBy
     };
