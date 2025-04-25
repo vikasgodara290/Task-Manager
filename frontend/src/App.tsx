@@ -14,9 +14,11 @@ function App() {
       let res = await axios.get(`${URL}card`);
       res = res.data;
       setCards(res);
-      console.log(res);
     })();
   }, []);
+
+  console.log(cards);
+
   return (
     <div className="flex w-screen h-screen bg-linear-to-bl from-violet-500 to-fuchsia-500">
       <div className="flex">
@@ -28,7 +30,7 @@ function App() {
           );
         })}
       </div>
-      <AddNewCard />
+      <AddNewCard cards={cards} setCards={setCards} />
     </div>
   );
 }

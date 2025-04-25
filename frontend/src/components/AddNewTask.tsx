@@ -4,7 +4,7 @@ interface AddCardProps {
   setIsAddNewTask: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function AddCard({ setIsAddNewTask }: AddCardProps) {
+export default function AddNewTask({ setIsAddNewTask }: AddCardProps) {
   const handleAddTask = () => {
     setIsAddNewTask(true);
   };
@@ -17,7 +17,7 @@ export default function AddCard({ setIsAddNewTask }: AddCardProps) {
         <span className="mr-2 text-[18px]">
           <IoAdd />
         </span>
-        <span>Add a card</span>
+        <span>Add a Task</span>
       </div>
     </>
   );
