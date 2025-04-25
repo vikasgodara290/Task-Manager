@@ -7,9 +7,9 @@ const URL = import.meta.env.VITE_URL;
 interface TaskProps {
   task: any;
   cardId: string;
-  setTasks: any;
+  setTasks?: any;
   taskList: any;
-  setIsAddNewTask: any;
+  setIsAddNewTask?: any;
   isAddNewTask: boolean;
 }
 export default function Task({
@@ -25,9 +25,8 @@ export default function Task({
   const [isEditTask, setIsEditTask] = useState<boolean>(false);
   const [editedTask, setEditedTask] = useState<string>(task.Task);
   console.log("this is from task: ", task.Task, task);
-  
 
-console.log('task',task);
+  console.log("task", task);
 
   useEffect(() => {
     if (!editedTask) {
@@ -46,18 +45,15 @@ console.log('task',task);
   const handleSaveTask = async () => {
     if (isAddNewTask) {
       //task, cardId, isDone, assignee, createdBy
-      const res = await axios.post(`${URL}task`,{
+      const res = await axios.post(`${URL}task`, {
         task: editTaskRef.current?.value,
         cardId: cardId,
         isDone: isChecked,
         assignee: 111,
-        createdBy: 110
-      })
+        createdBy: 110,
+      });
       const newTask = res.data;
-      setTasks([
-        ...taskList,
-        newTask
-      ]);
+      setTasks([...taskList, newTask]);
       setIsAddNewTask(false);
       setIsEditTask(false);
       return;
@@ -66,17 +62,17 @@ console.log('task',task);
       //    "id": 1,task,cardId: 990,"isDone": false,"assignee": 111,"modifiedBy": ""
       console.log(editTaskRef.current.id);
 
-      const res = await axios.put(`${URL}task`,{
+      const res = await axios.put(`${URL}task`, {
         id: Number(editTaskRef.current.id),
         task: editTaskRef.current?.value,
         cardId: cardId,
         isDone: isChecked,
         assignee: 111,
-        modifiedBy: ""
-      })
+        modifiedBy: "",
+      });
       const editedTask = res.data;
       console.log(editedTask);
-      
+
       setEditedTask(editedTask.Task);
       setIsEditTask(false);
       setIsAddNewTask(false);
@@ -98,10 +94,10 @@ console.log('task',task);
       <div className="flex border-2 border-black hover:border-blue-300 items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-2">
         <span className="mt-2.5 mx-1 shrink-0">
           <Status
-            taskId = {task.id}
-            isDone = {task.isDone}
+            taskId={task.id}
+            isDone={task.isDone}
             isChecked={isChecked}
-            setIsChecked = {setIsChecked}
+            setIsChecked={setIsChecked}
           />
         </span>
 
@@ -111,7 +107,7 @@ console.log('task',task);
           {isEditTask ? (
             <>
               <textarea
-                id={String (task.id)}
+                id={String(task.id)}
                 ref={editTaskRef}
                 className="w-full h-auto overflow-hidden outline-none resize-none p-0 m-0 bg-transparent text-inherit font-inherit"
                 defaultValue={editedTask}
