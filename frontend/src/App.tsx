@@ -20,7 +20,7 @@ function App() {
   console.log(cards);
 
   return (
-    <div className="flex w-screen h-screen bg-linear-to-bl from-violet-500 to-fuchsia-500">
+    <div className="flex">
       <div className="flex">
         {cards.map((card: any) => {
           return (
