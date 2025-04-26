@@ -79,6 +79,11 @@ export default function Task({
     }
   };
 
+  const handleTaskDragStart = () => {
+    console.log('drag started');
+    
+  }
+
   let taskStyle = isChecked ? "pr-1" : "pr-5";
 
   useEffect(() => {
@@ -91,7 +96,9 @@ export default function Task({
 
   return (
     <>
-      <div className="flex border-2 border-black hover:border-blue-300 items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-2">
+      <div draggable className="flex border-2 border-black hover:border-blue-300 items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-2"
+        onDragStart={handleTaskDragStart}
+        >
         <span className="mt-2.5 mx-1 shrink-0">
           <Status
             taskId={task.id}

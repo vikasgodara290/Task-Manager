@@ -124,7 +124,7 @@ app.post("/task", (req, res) => {
 });
 
 app.post("/card", (req, res) => {
-  const id = Tasks.length + 1;
+  const id = Cards.length + 1;
   const { cardName } = req.body;
 
   // Create a new task object

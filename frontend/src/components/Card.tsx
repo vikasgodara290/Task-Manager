@@ -45,9 +45,19 @@ const Card = ({ cardId, cardName }: CardProps) => {
     }
   };
 
+  const handleTaskDragOver = (e : React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    console.log('drag over', e.target);
+    
+  }
+  const handleTaskDrop = () => {
+    console.log('task droped');
+    
+  }
+
   return (
     <>
-      <div className="bg-black rounded-[12px] w-min min-w-60 h-min m-4">
+      <div onDragOver={(e) => handleTaskDragOver(e)} onDrop={handleTaskDrop} className="bg-black rounded-[12px] w-min min-w-60 h-min m-4">
         <div className="text-txtColor font-medium flex justify-between px-4 h-9 text-[16px] items-center">
           <input
             defaultValue={cardName}
