@@ -79,8 +79,9 @@ export default function Task({
     }
   };
 
-  const handleTaskDragStart = () => {
-    console.log('drag started');
+  const handleTaskDragStart = (e : React.DragEvent<HTMLDivElement>) => {
+    e.dataTransfer.setData('text/plain', (e.target as HTMLDivElement)?.id);
+    console.log('drag started', (e.target as HTMLDivElement)?.id);
     
   }
 
@@ -96,8 +97,8 @@ export default function Task({
 
   return (
     <>
-      <div draggable className="flex border-2 border-black hover:border-blue-300 items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-2"
-        onDragStart={handleTaskDragStart}
+      <div draggable id={String(task.id)} className="flex border-2 border-black hover:border-blue-300 items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-2"
+        onDragStart={e => handleTaskDragStart(e)}
         >
         <span className="mt-2.5 mx-1 shrink-0">
           <Status
@@ -109,6 +110,7 @@ export default function Task({
         </span>
 
         <div
+          id={String(task.id)} 
           className={`pl-1 ${taskStyle} w-full group-hover:pr-1 py-2 hover:cursor-pointer hover:transform hover:translate-x-0.5 transition-transform duration-700 text-[12px]`}
         >
           {isEditTask ? (
@@ -135,7 +137,7 @@ export default function Task({
               </button>
             </>
           ) : editedTask ? (
-            editedTask
+            <span id={String(task.id)}>{editedTask}</span>
           ) : (
             ""
           )}

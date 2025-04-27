@@ -177,6 +177,28 @@ app.put("/task", (req, res) => {
   res.status(200).json(Tasks[taskIndex]);
 });
 
+app.put("/reposition", (req, res) => {
+  // Extract data from the request body
+  const { id, cardId} = req.body;
+
+  const taskIndex = Tasks.findIndex((task) => task.id === parseInt(id, 10));
+
+  if (taskIndex === -1) {
+    // If the task is not found, return a 404 error
+    res.status(404).json({ message: `Task with id ${id} not found.` });
+    return;
+  }
+
+  // Update the task properties
+  Tasks[taskIndex] = {
+    ...Tasks[taskIndex],
+    CardId: cardId || Tasks[taskIndex].CardId
+  };
+
+  // Respond with the updated task
+  res.status(200).json(Tasks);
+});
+
 app.put("/card", (req, res) => {
   const { cardId, cardName } = req.body;
 
