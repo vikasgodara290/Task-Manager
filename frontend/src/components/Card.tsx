@@ -16,9 +16,9 @@ interface CardProps {
 
 const Card = ({ tasks, setTasks, cards, cardId, cardName, setCards }: CardProps) => {
   const [isAddNewTask, setIsAddNewTask] = useState<boolean>(false);
-  const [isCard, setIsCard] = useState<boolean>(false);
+  //const [isCard, setIsCard] = useState<boolean>(false);
   const cardNameRef = useRef<HTMLInputElement | null>(null);
-
+  let isCard = false;
   const saveInput = async (value: string) => {
     await axios.put(`${URL}card`, { cardId: cardId, cardName: value });
     console.log("Input saved:", value);
@@ -48,10 +48,10 @@ const Card = ({ tasks, setTasks, cards, cardId, cardName, setCards }: CardProps)
     console.log('task droped', e, e.dataTransfer.getData('text/plain'));
     
     while(!isCard){
-      console.log(isCard, cardEl);
+      console.log('cardel',cardEl.className);
       if(cardEl.className.includes('card') && e.dataTransfer.getData('text/plain')){
         console.log(cardEl.id);
-        setIsCard(true)
+        isCard = true;
         const res = await axios.put(`${URL}reposition`, {
           id: Number(e.dataTransfer.getData('text/plain')),
           cardId: Number(cardEl.id),
@@ -65,7 +65,6 @@ const Card = ({ tasks, setTasks, cards, cardId, cardName, setCards }: CardProps)
         cardEl = cardEl.parentElement as HTMLElement
       }
     }
-    console.log(isCard, cardEl);
   }
 
   return (
