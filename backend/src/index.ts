@@ -42,6 +42,7 @@ let Tasks = [
     CreatedBy: 100,
     ModifiedOn: "",
     ModifiedBy: 0,
+    Order: 1
   },
   {
     id: 2,
@@ -53,6 +54,7 @@ let Tasks = [
     CreatedBy: 100,
     ModifiedOn: "07-Apr-2025 9:00 AM",
     ModifiedBy: 112,
+    Order: 1
   },
   {
     id: 3,
@@ -64,6 +66,7 @@ let Tasks = [
     CreatedBy: 100,
     ModifiedOn: "06-Apr-2025 4:00 PM",
     ModifiedBy: 113,
+    Order: 1
   },
 ];
 let Users = [
@@ -106,6 +109,8 @@ app.post("/task", (req, res) => {
   const id = Tasks.length + 1;
   const { task, cardId, isDone, assignee, createdBy } = req.body;
 
+  const TasksByCardId = Tasks.filter(task => task.CardId === cardId);
+
   // Create a new task object
   const newTask = {
     id,
@@ -117,6 +122,7 @@ app.post("/task", (req, res) => {
     CreatedBy: createdBy,
     ModifiedOn: "",
     ModifiedBy: 0,
+    Order : TasksByCardId.length + 1
   };
 
   Tasks.push(newTask);
@@ -147,9 +153,8 @@ app.delete("/task/:id", (req, res) => {
 //edit a task
 app.put("/task", (req, res) => {
   // Extract data from the request body
-  const { id, task, cardId, isDone, assignee, modifiedBy } = req.body;
+  const { id, task, cardId, isDone, assignee, modifiedBy, order } = req.body;
   // Find the task by ID
-  console.log(id, isDone);
 
   const taskIndex = Tasks.findIndex((task) => task.id === parseInt(id, 10));
 
@@ -158,11 +163,10 @@ app.put("/task", (req, res) => {
     res.status(404).json({ message: `Task with id ${id} not found.` });
     return;
   }
-  console.log(taskIndex, Tasks[taskIndex], isDone);
 
   // Update the task properties
   Tasks[taskIndex] = {
-    id: id,
+    ...Tasks[taskIndex], 
     Task: task || Tasks[taskIndex].Task, // Update only if provided
     CardId: cardId || Tasks[taskIndex].CardId,
     isDone: isDone ?? Tasks[taskIndex].isDone,
@@ -171,6 +175,7 @@ app.put("/task", (req, res) => {
     CreatedBy: Tasks[taskIndex].CreatedBy,
     ModifiedOn: new Date().toLocaleString(), // Set the current date and time
     ModifiedBy: modifiedBy || Tasks[taskIndex].ModifiedBy,
+    Order: order || Tasks[taskIndex].Order
   };
 
   // Respond with the updated task

@@ -11,7 +11,7 @@ export default function AddNewTask({ setIsAddNewTask }: AddCardProps) {
   return (
     <>
       <div
-        className="text-txtColor h-9 flex px-4 items-center text-[14px] hover:cursor-pointer"
+        className="addNewTask text-txtColor h-9 flex px-4 items-center text-[14px] hover:cursor-pointer"
         onClick={handleAddTask}
       >
         <span className="mr-2 text-[18px]">
