@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Status from "./Status";
 import EditTask from "./EditTask";
 import axios from "axios";
@@ -24,6 +24,8 @@ export default function Task({
   const [isChecked, setIsChecked] = useState<boolean>(task.isDone);
   const [isEditTask, setIsEditTask] = useState<boolean>(false);
   const [editedTask, setEditedTask] = useState<string>(task.Task);
+  const [isTaskDragOvered, setIsTaskDragOvered] = useState<boolean>(false);
+  const [isTaskDragged, setIsTaskDragged] = useState<boolean>(false);
   console.log("this is from task: ", task.Task, task);
 
   console.log("task", task);
@@ -82,7 +84,7 @@ export default function Task({
   const handleTaskDragStart = (e : React.DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData('text/plain', (e.target as HTMLDivElement)?.id);
     console.log('drag started', (e.target as HTMLDivElement)?.id);
-    
+    setIsTaskDragged(true);
   }
 
   let taskStyle = isChecked ? "pr-1" : "pr-5";
@@ -95,10 +97,32 @@ export default function Task({
     }
   }, [isEditTask]);
 
+  const handleOnTaskDragOver = useCallback( (e : React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    //console.log('this is from task comp', e.currentTarget);
+    setIsTaskDragOvered(true)
+  }, [])
+
+  const handleOnTaskDragLeave = useCallback( (e : React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    //console.log('this is from task comp', e.currentTarget);
+    setIsTaskDragOvered(false)
+  }, [])
+
+  const handleTaskDropOnTask = (e : React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsTaskDragOvered(false)
+    console.log('this is from task comp', e.currentTarget);
+    setIsTaskDragged(false);
+  }
+
   return (
     <>
-      <div draggable id={String(task.id)} className="flex border-2 border-black hover:border-blue-300 items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-0.5"
+      <div draggable id={String(task.id)} className={`flex ${isTaskDragOvered? ' border-t-2 border-blue-300 ' : ' border-2 border-black '} ${!isTaskDragged && 'hover:border-blue-300'} items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-0.5`}
         onDragStart={e => handleTaskDragStart(e)}
+        onDragOver={e => handleOnTaskDragOver(e)}
+        onDragLeave={e => handleOnTaskDragLeave(e)}
+        onDrop={e => handleTaskDropOnTask(e)}
         >
         <span className="mt-2.5 mx-1 shrink-0">
           <Status
