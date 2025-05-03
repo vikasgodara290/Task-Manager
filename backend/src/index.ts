@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import {v4 as uuidv4} from "uuid"
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(express.json());
@@ -16,6 +17,8 @@ Task model/object
     ModifiedOn
     ModifiedBy
 -------*/
+let idCounter = 1000; 
+
 let Cards = [
   {
     CardId: 990,
@@ -106,7 +109,7 @@ app.get("/taskById/:id", (req, res) => {
 });
 
 app.post("/task", (req, res) => {
-  const id = Tasks.length + 1;
+  const id = idCounter++;
   const { task, cardId, isDone, assignee, createdBy } = req.body;
 
   const TasksByCardId = Tasks.filter(task => task.CardId === cardId);
@@ -130,7 +133,7 @@ app.post("/task", (req, res) => {
 });
 
 app.post("/card", (req, res) => {
-  const id = Cards.length + 1;
+  const id = idCounter++;
   const { cardName } = req.body;
 
   // Create a new task object
@@ -148,6 +151,13 @@ app.delete("/task/:id", (req, res) => {
   const id = parseInt(req.params.id, 10);
   Tasks = Tasks.filter((task) => task.id !== id);
   res.status(200).json({ message: `Task with id ${id} deleted successfully.` });
+});
+
+app.delete("/card/:cardId", (req, res) => {
+  const cardId = Number (req.params.cardId);
+  Tasks = Tasks.filter(task => task.CardId !== cardId);
+  Cards = Cards.filter(card => card.CardId !== cardId);
+  res.json({Cards, Tasks});
 });
 
 //edit a task

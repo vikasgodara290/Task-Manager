@@ -38,7 +38,7 @@ function App() {
         {cards.map((card: any) => {
           return (
             <>
-              <Card tasks={tasks} setTasks={setTasks} cards={cards} cardId={card.CardId} cardName={card.CardName} setCards={setCards}/>
+              <Card key={card.CardId} tasks={tasks} setTasks={setTasks} cards={cards} cardId={card.CardId} cardName={card.CardName} setCards={setCards}/>
             </>
           );
         })}

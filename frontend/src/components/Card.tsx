@@ -23,7 +23,8 @@ const Card = ({
   setCards,
 }: CardProps) => {
   const [isAddNewTask, setIsAddNewTask] = useState<boolean>(false);
-  //const [isCard, setIsCard] = useState<boolean>(false);
+  const [isCardMenuOpen, setIsCardMenuOpen] = useState<boolean>(false);
+  const [newCardName, setNewCardName] = useState<string>(cardName);
   const cardNameRef = useRef<HTMLInputElement | null>(null);
   let isCard = false;
   const saveInput = async (value: string) => {
@@ -42,6 +43,7 @@ const Card = ({
   const handleBlur = () => {
     if (cardNameRef.current) {
       saveInput(cardNameRef.current?.value);
+      setNewCardName(cardNameRef.current?.value)
     }
   };
 
@@ -77,6 +79,19 @@ const Card = ({
     }
   };
 
+  const handleOnClickCardManu = () => {
+    isCardMenuOpen? setIsCardMenuOpen(false) : setIsCardMenuOpen(true);
+  }
+
+  const handleCardDelete = async () => {
+    const res = await axios.delete(`${URL}card/${cardId}`);
+    console.log(res.data);
+    setCards(res.data.Cards);
+    setTasks(res.data.Tasks);
+    setIsCardMenuOpen(false);
+    setNewCardName(cardName);
+  }
+
   return (
     <>
       <div
@@ -85,15 +100,20 @@ const Card = ({
         onDrop={(e) => handleTaskDrop(e)}
         className="card bg-black rounded-[12px] w-min min-w-60 h-min m-4"
       >
+        {isCardMenuOpen && <div className="absolute rounded-[8px] w-25 h-25 bg-black/70 flex justify-center ml-35 mt-9">
+          <div className="menuitem text-txtColor py-1 hover:cursor-pointer" onClick={handleCardDelete}>
+            Delete
+          </div>
+        </div>}
         <div className="cardHeader text-txtColor font-medium flex justify-between px-4 h-9 text-[16px] items-center">
           <input
-            defaultValue={cardName}
+            defaultValue={newCardName}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             ref={cardNameRef}
             className="border-2 border-black focus:border-blue-300 focus:px-1 mr-2 rounded-[2px] w-full outline-none hover:cursor-pointer"
           />
-          <div className="">
+          <div className="hover:cursor-pointer" onClick={handleOnClickCardManu}>
             <BsThreeDots />
           </div>
         </div>
