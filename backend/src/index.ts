@@ -150,7 +150,7 @@ app.post("/card", (req, res) => {
 app.delete("/task/:id", (req, res) => {
   const id = parseInt(req.params.id, 10);
   Tasks = Tasks.filter((task) => task.id !== id);
-  res.status(200).json({ message: `Task with id ${id} deleted successfully.` });
+  res.status(200).json(Tasks);
 });
 
 app.delete("/card/:cardId", (req, res) => {
