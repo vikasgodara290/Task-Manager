@@ -5,6 +5,7 @@ import axios from "axios";
 const URL = import.meta.env.VITE_URL;
 
 interface TaskProps {
+  taskId: number;
   task: any;
   cardId: string;
   setTasks?: any;
@@ -13,6 +14,7 @@ interface TaskProps {
   isAddNewTask: boolean;
 }
 export default function Task({
+  taskId,
   task,
   cardId,
   setTasks,
@@ -26,6 +28,21 @@ export default function Task({
   const [editedTask, setEditedTask] = useState<string>(task.Task);
   const [isTaskDragOvered, setIsTaskDragOvered] = useState<boolean>(false);
   const [isTaskDragged, setIsTaskDragged] = useState<boolean>(false);
+  const [visible, setVisible] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      // hide menu on outside click
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setVisible(false);
+      }
+    };
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
+
   console.log("this is from task: ", task.Task, task);
 
   console.log("task", task);
@@ -81,11 +98,11 @@ export default function Task({
     }
   };
 
-  const handleTaskDragStart = (e : React.DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData('text/plain', (e.target as HTMLDivElement)?.id);
-    console.log('drag started', (e.target as HTMLDivElement)?.id);
+  const handleTaskDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    e.dataTransfer.setData("text/plain", (e.target as HTMLDivElement)?.id);
+    console.log("drag started", (e.target as HTMLDivElement)?.id);
     setIsTaskDragged(true);
-  }
+  };
 
   let taskStyle = isChecked ? "pr-1" : "pr-5";
 
@@ -97,40 +114,68 @@ export default function Task({
     }
   }, [isEditTask]);
 
-  const handleOnTaskDragOver = useCallback( (e : React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    //console.log('this is from task comp', e.currentTarget);
-    setIsTaskDragOvered(true)
-  }, [])
+  const handleOnTaskDragOver = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      //console.log('this is from task comp', e.currentTarget);
+      setIsTaskDragOvered(true);
+    },
+    []
+  );
 
-  const handleOnTaskDragLeave = useCallback( (e : React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    //console.log('this is from task comp', e.currentTarget);
-    setIsTaskDragOvered(false)
-  }, [])
+  const handleOnTaskDragLeave = useCallback(
+    (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      //console.log('this is from task comp', e.currentTarget);
+      setIsTaskDragOvered(false);
+    },
+    []
+  );
 
-  const handleTaskDropOnTask = async (e : React.DragEvent<HTMLDivElement>) => {
+  const handleTaskDropOnTask = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setIsTaskDragOvered(false)
-    console.log('this is from task comp', e.currentTarget.id);
+    setIsTaskDragOvered(false);
+    console.log("this is from task comp", e.currentTarget.id);
     console.log(e.dataTransfer.getData("text/plain"));
-    
-    const res = await axios.put(`${URL}reorder`,{
-      droppedId : e.dataTransfer.getData("text/plain"),
-      droppedOnId : e.currentTarget.id
-    })
-    setTasks(res.data)
+
+    const res = await axios.put(`${URL}reorder`, {
+      droppedId: e.dataTransfer.getData("text/plain"),
+      droppedOnId: e.currentTarget.id,
+    });
+    setTasks(res.data);
     setIsTaskDragged(false);
+  };
+
+  const handleContextMenuOfTask = (e: React.MouseEvent) => {
+    console.log("click");
+    e.preventDefault();
+    setPosition({ x: e.pageX, y: e.pageY });
+    setVisible(true);
+  };
+
+  const handleTaskDelete = async () => {
+    const res = await axios.delete(`${URL}task/${taskId}`) 
+    setTasks(res.data)
   }
 
   return (
     <>
-      <div draggable id={String(task.id)} className={`flex ${isTaskDragOvered? ' border-t-2 border-blue-300 ' : ' border-2 border-black '} ${!isTaskDragged && 'hover:border-blue-300'} items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-0.5`}
-        onDragStart={e => handleTaskDragStart(e)}
-        onDragOver={e => handleOnTaskDragOver(e)}
-        onDragLeave={e => handleOnTaskDragLeave(e)}
-        onDrop={e => handleTaskDropOnTask(e)}
-        >
+      <div
+        draggable
+        id={String(task.id)}
+        className={`flex ${
+          isTaskDragOvered
+            ? " border-t-2 border-blue-300 "
+            : " border-2 border-black "
+        } ${
+          !isTaskDragged && "hover:border-blue-300"
+        } items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-0.5`}
+        onDragStart={(e) => handleTaskDragStart(e)}
+        onDragOver={(e) => handleOnTaskDragOver(e)}
+        onDragLeave={(e) => handleOnTaskDragLeave(e)}
+        onDrop={(e) => handleTaskDropOnTask(e)}
+        onContextMenu={(e) => handleContextMenuOfTask(e)}
+      >
         <span className="mt-2.5 mx-1 shrink-0">
           <Status
             taskId={task.id}
@@ -141,7 +186,7 @@ export default function Task({
         </span>
 
         <div
-          id={String(task.id)} 
+          id={String(task.id)}
           className={`pl-1 ${taskStyle} w-full group-hover:pr-1 py-2 hover:cursor-pointer hover:transform hover:translate-x-0.5 transition-transform duration-700 text-[12px]`}
         >
           {isEditTask ? (
@@ -173,6 +218,26 @@ export default function Task({
             ""
           )}
         </div>
+
+        <div >
+        {visible && (
+          <div
+            ref={menuRef}
+            style={{
+              position: "absolute",
+              top: position.y,
+              left: position.x,
+              boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+              borderRadius: "4px",
+              zIndex: 1000,
+            }}
+            className="py-2 px-10 bg-black/70 text-txtColor hover:cursor-pointer"
+            onClick={handleTaskDelete}
+          >
+            delete
+          </div>
+        )}
+      </div>
 
         {!isAddNewTask && (
           <span className="ml-auto mx-1 mt-2">

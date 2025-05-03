@@ -123,10 +123,11 @@ const Card = ({
             .filter((task: any) => task.CardId === cardId)
             .map((task: any) => {
               return (
-                <div className="task border-t-2 border-black">
+                <div key={task.id} className="task border-t-2 border-black">
                   <Task
                     key={task.id}
                     cardId={cardId}
+                    taskId = {task.id}
                     task={task}
                     setTasks={setTasks}
                     taskList={tasks}
@@ -141,6 +142,7 @@ const Card = ({
           <Task
             key={3423}
             cardId={cardId}
+            taskId={0}
             task={{ id: 0, task: "" }}
             setTasks={setTasks}
             taskList={tasks}
