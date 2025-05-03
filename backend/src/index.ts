@@ -204,6 +204,35 @@ app.put("/reposition", (req, res) => {
   res.status(200).json(Tasks);
 });
 
+app.put("/reorder", (req, res) => {
+  // Extract data from the request body
+  const { droppedId, droppedOnId} = req.body;
+
+  const taskDroppedOnIndex = Tasks.findIndex((task) => task.id === parseInt(droppedOnId, 10));
+  const taskDroppedIndex = Tasks.findIndex((task) => task.id === parseInt(droppedId, 10));
+  
+  if (taskDroppedOnIndex === -1) {
+    // If the task is not found, return a 404 error
+    res.status(404).json({ message: `Task with id ${droppedOnId} not found.` });
+    return;
+  }
+  
+  // Update the task properties
+  Tasks[taskDroppedIndex] = {
+    ...Tasks[taskDroppedIndex],
+    CardId: Tasks[taskDroppedOnIndex].CardId
+  };
+
+
+  const [item] = Tasks.splice(taskDroppedIndex, 1);
+  Tasks.splice(taskDroppedOnIndex , 0, item);
+
+  console.log(Tasks);
+  
+  // Respond with the updated task
+  res.status(200).json(Tasks);
+});
+
 app.put("/card", (req, res) => {
   const { cardId, cardName } = req.body;
 

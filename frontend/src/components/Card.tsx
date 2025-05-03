@@ -101,7 +101,6 @@ const Card = ({
         {tasks &&
           tasks
             .filter((task: any) => task.CardId === cardId)
-            .sort((a: any, b: any) => a.order - b.order)
             .map((task: any) => {
               return (
                 <div className="task border-t-2 border-black">

@@ -109,10 +109,17 @@ export default function Task({
     setIsTaskDragOvered(false)
   }, [])
 
-  const handleTaskDropOnTask = (e : React.DragEvent<HTMLDivElement>) => {
+  const handleTaskDropOnTask = async (e : React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsTaskDragOvered(false)
-    console.log('this is from task comp', e.currentTarget);
+    console.log('this is from task comp', e.currentTarget.id);
+    console.log(e.dataTransfer.getData("text/plain"));
+    
+    const res = await axios.put(`${URL}reorder`,{
+      droppedId : e.dataTransfer.getData("text/plain"),
+      droppedOnId : e.currentTarget.id
+    })
+    setTasks(res.data)
     setIsTaskDragged(false);
   }
 
