@@ -1,29 +1,23 @@
 import axios from "axios";
 import { FaPlus } from "react-icons/fa6";
+import { CardType } from "../utils/CustomDataTypes";
 const URL = import.meta.env.VITE_URL;
 
 interface AddNewCardProps {
   setCards: React.Dispatch<React.SetStateAction<any>>;
-  cards: any;
 }
 
-const AddNewCard = ({ cards, setCards }: AddNewCardProps) => {
+const AddNewCard = ({ setCards }: AddNewCardProps) => {
   const handleAddNewCard = async () => {
-    console.log(cards.length);
 
     const res = await axios.post(`${URL}card`, {
       cardName: "New Card",
+      createdBy : "681611c60a4a306175553be2"
     });
 
-    const newCard = res.data;
+    const cards : CardType[] = res.data;
 
-    setCards([
-      ...cards,
-      {
-        CardId: newCard.CardId,
-        CardName: newCard.CardName,
-      },
-    ]);
+    setCards(cards);
   };
 
   return (

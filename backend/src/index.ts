@@ -77,27 +77,27 @@ app.delete("/card/:cardId", async (req, res) => {
 app.put("/task", async (req, res) => {
   const { id, task, cardId, isDone, assignee, modifiedBy } = req.body;
 
-  const updatedTask = await TaskModel.updateOne({_id : id}, {
+  await TaskModel.updateOne({_id : id}, {
     Task : task,
     CardId : cardId,
     isDone : isDone,
     Assignee : assignee,
     ModifiedBy : modifiedBy
   })
-
-  res.status(200).json(updatedTask);
+  const editedTask = await TaskModel.findById({_id : id})
+  res.status(200).json(editedTask);
 });
 
 //Return : updated task
 app.put("/reposition", async (req, res) => {
   const { id, cardId, modifiedBy } = req.body;
 
-  const updatedTask = await TaskModel.updateOne({_id : id}, {
+  await TaskModel.updateOne({_id : id}, {
     CardId : cardId,
     ModifiedBy : modifiedBy
   })
-
-  res.status(200).json(updatedTask);
+  const tasks = await TaskModel.find();
+  res.status(200).json(tasks);
 });
 
 app.put("/reorder", async (req, res) => {
@@ -108,7 +108,6 @@ app.put("/reorder", async (req, res) => {
  
   const taskDroppedOnIndex = tasks.findIndex((task) => task._id.equals( droppedOnId ));
   const taskDroppedIndex = tasks.findIndex((task) => task._id.equals( droppedId ));
-  console.log("indexes", taskDroppedIndex, taskDroppedOnIndex);
   
   if (taskDroppedOnIndex === -1) {
     // If the task is not found, return a 404 error
@@ -126,7 +125,6 @@ app.put("/reorder", async (req, res) => {
 
   const [item] = tasks.splice(taskDroppedIndex, 1);
   tasks.splice(taskDroppedOnIndex , 0, item);
-  console.log(tasks);
   
   res.status(200).json(tasks);
 });

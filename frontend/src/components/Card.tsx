@@ -3,13 +3,12 @@ import AddNewTask from "./AddNewTask";
 import Task from "./Task";
 import axios from "axios";
 import { BsThreeDots } from "react-icons/bs";
+import { CardType, TaskType } from "../utils/CustomDataTypes";
 const URL = import.meta.env.VITE_URL;
 
 interface CardProps {
-  cards: any;
-  cardId: string;
-  cardName: string;
-  tasks: any;
+  card : CardType;
+  tasks: TaskType[];
   setTasks: React.Dispatch<React.SetStateAction<any>>;
   setCards: React.Dispatch<React.SetStateAction<any>>;
 }
@@ -17,18 +16,20 @@ interface CardProps {
 const Card = ({
   tasks,
   setTasks,
-  cardId,
-  cardName,
+  card,
   setCards,
 }: CardProps) => {
   const [isAddNewTask, setIsAddNewTask] = useState<boolean>(false);
   const [isCardMenuOpen, setIsCardMenuOpen] = useState<boolean>(false);
-  const [newCardName, setNewCardName] = useState<string>(cardName);
+  const [newCardName, setNewCardName] = useState<string>(card.CardName);
   const cardNameRef = useRef<HTMLInputElement | null>(null);
+  
   let isCard = false;
+
+  //Saving Card Name
+  //-------------------------------------------------------------------------//
   const saveInput = async (value: string) => {
-    await axios.put(`${URL}card`, { cardId: cardId, cardName: value });
-    console.log("Input saved:", value);
+    await axios.put(`${URL}card`, { cardId: card._id, cardName: value });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -45,19 +46,17 @@ const Card = ({
       setNewCardName(cardNameRef.current?.value)
     }
   };
+  //-------------------------------------------------------------------------//
+
 
   const handleTaskDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    //let cardEl = e.target as HTMLElement;
-    //console.log("drag over", e.target, cardEl.className);
   };
+
   const handleTaskDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     let cardEl = e.currentTarget as HTMLElement;
-    console.log("task droped", e, e.dataTransfer.getData("text/plain"));
-    console.log('this is dropped current target', cardEl);
     
     while (!isCard) {
-      console.log("cardel", cardEl.className);
       if (
         cardEl.className.includes("card") &&
         e.dataTransfer.getData("text/plain")
@@ -65,12 +64,12 @@ const Card = ({
         console.log(cardEl.id);
         isCard = true;
         const res = await axios.put(`${URL}reposition`, {
-          id: Number(e.dataTransfer.getData("text/plain")),
-          cardId: Number(cardEl.id),
+          id: e.dataTransfer.getData("text/plain"),
+          cardId: cardEl.id,
         });
-        console.log(res);
         if (res) {
-          setTasks(res.data);
+          const tasks : TaskType[] = res.data;
+          setTasks(tasks);
         }
       } else {
         cardEl = cardEl.parentElement as HTMLElement;
@@ -83,18 +82,16 @@ const Card = ({
   }
 
   const handleCardDelete = async () => {
-    const res = await axios.delete(`${URL}card/${cardId}`);
-    console.log(res.data);
+    const res = await axios.delete(`${URL}card/${card._id}`);
     setCards(res.data.Cards);
     setTasks(res.data.Tasks);
     setIsCardMenuOpen(false);
-    setNewCardName(cardName);
   }
 
   return (
     <>
       <div
-        id={cardId}
+        id={card._id}
         onDragOver={(e) => handleTaskDragOver(e)}
         onDrop={(e) => handleTaskDrop(e)}
         className="card bg-black rounded-[12px] w-min min-w-60 h-min m-4"
@@ -119,14 +116,12 @@ const Card = ({
 
         {tasks &&
           tasks
-            .filter((task: any) => task.CardId === cardId)
-            .map((task: any) => {
+            .filter(task => task.CardId === card._id)
+            .map((task: TaskType) => {
               return (
-                <div key={task.id} className="task border-t-2 border-black">
+                <div key={task._id} className="task border-t-2 border-black">
                   <Task
-                    key={task.id}
-                    cardId={cardId}
-                    taskId = {task.id}
+                    key={task._id}
                     task={task}
                     setTasks={setTasks}
                     taskList={tasks}
@@ -140,9 +135,7 @@ const Card = ({
         {isAddNewTask && (
           <Task
             key={3423}
-            cardId={cardId}
-            taskId={0}
-            task={{ id: 0, task: "" }}
+            task={{ _id: "0", Task: "", CardId : card._id, isDone : false, ModifiedBy : "", CreatedBy : "", Assignee : "", updatedAt : "", createdAt : "" }}
             setTasks={setTasks}
             taskList={tasks}
             setIsAddNewTask={setIsAddNewTask}

@@ -6,7 +6,7 @@ const URL = import.meta.env.VITE_URL;
 interface StatusProps {
   isChecked: boolean | null;
   isDone : boolean;
-  taskId: number;
+  taskId: string;
   setIsChecked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const Status = ({isDone, isChecked, setIsChecked, taskId}: StatusProps) => {

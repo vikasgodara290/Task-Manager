@@ -2,21 +2,18 @@ import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import Status from "./Status";
 import EditTask from "./EditTask";
 import axios from "axios";
+import { TaskType } from "../utils/CustomDataTypes";
 const URL = import.meta.env.VITE_URL;
 
 interface TaskProps {
-  taskId: number;
-  task: any;
-  cardId: string;
+  task: TaskType;
   setTasks?: any;
-  taskList: any;
+  taskList: TaskType [];
   setIsAddNewTask?: any;
   isAddNewTask: boolean;
 }
 export default function Task({
-  taskId,
   task,
-  cardId,
   setTasks,
   taskList,
   setIsAddNewTask,
@@ -32,9 +29,11 @@ export default function Task({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
 
+  //Context Menu
+  //---------------------------------------------------------------------//
+  //Hide Menu
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      // hide menu on outside click
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setVisible(false);
       }
@@ -42,10 +41,6 @@ export default function Task({
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
   }, []);
-
-  console.log("this is from task: ", task.Task, task);
-
-  console.log("task", task);
 
   useEffect(() => {
     if (!editedTask) {
@@ -66,31 +61,28 @@ export default function Task({
       //task, cardId, isDone, assignee, createdBy
       const res = await axios.post(`${URL}task`, {
         task: editTaskRef.current?.value,
-        cardId: cardId,
+        cardId: task.CardId,
         isDone: isChecked,
-        assignee: 111,
-        createdBy: 110,
+        assignee: "681611c60a4a306175553be2",
+        createdBy: "681611c60a4a306175553be2",
+        modifiedBy: "681611c60a4a306175553be2",
       });
-      const newTask = res.data;
-      setTasks([...taskList, newTask]);
+      const tasks : TaskType[] = res.data;
+      setTasks(tasks);
       setIsAddNewTask(false);
       setIsEditTask(false);
       return;
     }
     if (editTaskRef.current) {
-      //    "id": 1,task,cardId: 990,"isDone": false,"assignee": 111,"modifiedBy": ""
-      console.log(editTaskRef.current.id);
-
       const res = await axios.put(`${URL}task`, {
-        id: Number(editTaskRef.current.id),
+        id: editTaskRef.current.id,
         task: editTaskRef.current?.value,
-        cardId: cardId,
+        cardId: task.CardId,
         isDone: isChecked,
-        assignee: 111,
-        modifiedBy: "",
+        assignee: "681611c60a4a306175553be2",
+        modifiedBy: "681611c60a4a306175553be2",
       });
-      const editedTask = res.data;
-      console.log(editedTask);
+      const editedTask : TaskType = res.data;
 
       setEditedTask(editedTask.Task);
       setIsEditTask(false);
@@ -100,7 +92,6 @@ export default function Task({
 
   const handleTaskDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData("text/plain", (e.target as HTMLDivElement)?.id);
-    console.log("drag started", (e.target as HTMLDivElement)?.id);
     setIsTaskDragged(true);
   };
 
@@ -117,7 +108,6 @@ export default function Task({
   const handleOnTaskDragOver = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
-      //console.log('this is from task comp', e.currentTarget);
       setIsTaskDragOvered(true);
     },
     []
@@ -126,7 +116,6 @@ export default function Task({
   const handleOnTaskDragLeave = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
-      //console.log('this is from task comp', e.currentTarget);
       setIsTaskDragOvered(false);
     },
     []
@@ -135,8 +124,6 @@ export default function Task({
   const handleTaskDropOnTask = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsTaskDragOvered(false);
-    console.log("this is from task comp", e.currentTarget.id);
-    console.log(e.dataTransfer.getData("text/plain"));
 
     const res = await axios.put(`${URL}reorder`, {
       droppedId: e.dataTransfer.getData("text/plain"),
@@ -147,14 +134,13 @@ export default function Task({
   };
 
   const handleContextMenuOfTask = (e: React.MouseEvent) => {
-    console.log("click");
     e.preventDefault();
     setPosition({ x: e.pageX, y: e.pageY });
     setVisible(true);
   };
 
   const handleTaskDelete = async () => {
-    const res = await axios.delete(`${URL}task/${taskId}`) 
+    const res = await axios.delete(`${URL}task/${task._id}`) 
     setTasks(res.data)
   }
 
@@ -162,7 +148,7 @@ export default function Task({
     <>
       <div
         draggable
-        id={String(task.id)}
+        id={task._id}
         className={`flex ${
           isTaskDragOvered
             ? " border-t-2 border-blue-300 "
@@ -178,7 +164,7 @@ export default function Task({
       >
         <span className="mt-2.5 mx-1 shrink-0">
           <Status
-            taskId={task.id}
+            taskId={task._id}
             isDone={task.isDone}
             isChecked={isChecked}
             setIsChecked={setIsChecked}
@@ -186,13 +172,13 @@ export default function Task({
         </span>
 
         <div
-          id={String(task.id)}
+          id={task._id}
           className={`pl-1 ${taskStyle} w-full group-hover:pr-1 py-2 hover:cursor-pointer hover:transform hover:translate-x-0.5 transition-transform duration-700 text-[12px]`}
         >
           {isEditTask ? (
             <>
               <textarea
-                id={String(task.id)}
+                id={task._id}
                 ref={editTaskRef}
                 className="w-full h-auto overflow-hidden outline-none resize-none p-0 m-0 bg-transparent text-inherit font-inherit"
                 defaultValue={editedTask}
@@ -213,7 +199,7 @@ export default function Task({
               </button>
             </>
           ) : editedTask ? (
-            <span id={String(task.id)}>{editedTask}</span>
+            <span id={task._id}>{editedTask}</span>
           ) : (
             ""
           )}
@@ -241,7 +227,7 @@ export default function Task({
 
         {!isAddNewTask && (
           <span className="ml-auto mx-1 mt-2">
-            <EditTask task={task} setIsEditTask={setIsEditTask} />
+            <EditTask task={task.Task} setIsEditTask={setIsEditTask} />
           </span>
         )}
       </div>

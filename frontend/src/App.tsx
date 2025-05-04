@@ -3,30 +3,30 @@ import "./App.css";
 import Card from "./components/Card";
 import axios from "axios";
 import AddNewCard from "./components/AddNewCard";
+import { CardType, TaskType } from "./utils/CustomDataTypes";
 const URL = import.meta.env.VITE_URL;
 
 function App() {
-  const [cards, setCards] = useState<any>([]);
-  const [tasks, setTasks] = useState<any>(undefined);
-
+  const [cards, setCards] = useState<CardType[] >([]);
+  const [tasks, setTasks] = useState<TaskType[] >([]);
 
   useEffect(() => {
     //func which call itself
     //async func can't be declared inside a useEffect directly
     (async () => {
-      let res = await axios.get(`${URL}task`);
-      res = res.data;
-      setTasks(res);
-      console.log("from cards", res);
+      const res = await axios.get(`${URL}task`);
+      const tasks: TaskType[] = res.data;
+      setTasks(tasks);
+      console.log("from cards", tasks);
     })();
   }, []);
-  
+
   useEffect(() => {
     //this function will get cards
     (async () => {
-      let res = await axios.get(`${URL}card`);
-      res = res.data;
-      setCards(res);
+      const res = await axios.get(`${URL}card`);
+      const cards: CardType[] = res.data;
+      setCards(cards);
     })();
   }, []);
 
@@ -35,13 +35,21 @@ function App() {
   return (
     <div className="flex">
       <div className="flex">
-        {cards.map((card: any) => {
-          return (
-            <Card key={card.CardId} tasks={tasks} setTasks={setTasks} cards={cards} cardId={card.CardId} cardName={card.CardName} setCards={setCards}/>
-          );
-        })}
+        {cards &&
+          tasks &&
+          cards.map((card: CardType) => {
+            return (
+              <Card
+                key={card._id}
+                tasks={tasks}
+                setTasks={setTasks}
+                card={card}
+                setCards={setCards}
+              />
+            );
+          })}
       </div>
-      <AddNewCard cards={cards} setCards={setCards} />
+      <AddNewCard setCards={setCards} />
     </div>
   );
 }
