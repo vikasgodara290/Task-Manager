@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import AddNewTask from "./AddNewTask";
 import Task from "./Task";
 import axios from "axios";
@@ -17,7 +17,6 @@ interface CardProps {
 const Card = ({
   tasks,
   setTasks,
-  cards,
   cardId,
   cardName,
   setCards,
@@ -49,7 +48,7 @@ const Card = ({
 
   const handleTaskDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    let cardEl = e.target as HTMLElement;
+    //let cardEl = e.target as HTMLElement;
     //console.log("drag over", e.target, cardEl.className);
   };
   const handleTaskDrop = async (e: React.DragEvent<HTMLDivElement>) => {
