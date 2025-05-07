@@ -15,7 +15,6 @@ interface TaskProps {
 export default function Task({
   task,
   setTasks,
-  taskList,
   setIsAddNewTask,
   isAddNewTask,
 }: TaskProps) {
