@@ -10,7 +10,6 @@ interface StatusProps {
   setIsChecked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const Status = ({isDone, isChecked, setIsChecked, taskId}: StatusProps) => {
-  console.log("this is from tatus: ",isDone);
   
   const uncheckedStyle = isChecked
     ? "border-green-300 bg-green-300 "
@@ -18,7 +17,6 @@ const Status = ({isDone, isChecked, setIsChecked, taskId}: StatusProps) => {
   const checkedStyle = isChecked ? "block " : "hidden ";
 
   useEffect(()=>{
-    console.log("this is from status: ",isChecked);
     (
       async () => {
         await axios.put(`${URL}task`,{

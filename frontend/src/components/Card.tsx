@@ -4,26 +4,23 @@ import Task from "./Task";
 import axios from "axios";
 import { BsThreeDots } from "react-icons/bs";
 import { CardType, TaskType } from "../utils/CustomDataTypes";
+import { useDroppable } from "@dnd-kit/core";
+import DropDiv from "./DropDiv";
 const URL = import.meta.env.VITE_URL;
 
 interface CardProps {
-  card : CardType;
+  card: CardType;
   tasks: TaskType[];
   setTasks: React.Dispatch<React.SetStateAction<any>>;
   setCards: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const Card = ({
-  tasks,
-  setTasks,
-  card,
-  setCards,
-}: CardProps) => {
+const Card = ({ tasks, setTasks, card, setCards }: CardProps) => {
   const [isAddNewTask, setIsAddNewTask] = useState<boolean>(false);
   const [isCardMenuOpen, setIsCardMenuOpen] = useState<boolean>(false);
   const [newCardName, setNewCardName] = useState<string>(card.CardName);
   const cardNameRef = useRef<HTMLInputElement | null>(null);
-  
+
   let isCard = false;
 
   //Saving Card Name
@@ -43,19 +40,20 @@ const Card = ({
   const handleBlur = () => {
     if (cardNameRef.current) {
       saveInput(cardNameRef.current?.value);
-      setNewCardName(cardNameRef.current?.value)
+      setNewCardName(cardNameRef.current?.value);
     }
   };
   //-------------------------------------------------------------------------//
 
-
+  //Task Drop handle
+  //-------------------------------------------------------------------------//
   const handleTaskDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
 
   const handleTaskDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     let cardEl = e.currentTarget as HTMLElement;
-    
+
     while (!isCard) {
       if (
         cardEl.className.includes("card") &&
@@ -68,7 +66,7 @@ const Card = ({
           cardId: cardEl.id,
         });
         if (res) {
-          const tasks : TaskType[] = res.data;
+          const tasks: TaskType[] = res.data;
           setTasks(tasks);
         }
       } else {
@@ -76,31 +74,51 @@ const Card = ({
       }
     }
   };
+  //-------------------------------------------------------------------------//
 
+  //Context menu
+  //-------------------------------------------------------------------------//
   const handleOnClickCardManu = () => {
-    isCardMenuOpen? setIsCardMenuOpen(false) : setIsCardMenuOpen(true);
-  }
+    isCardMenuOpen ? setIsCardMenuOpen(false) : setIsCardMenuOpen(true);
+  };
 
   const handleCardDelete = async () => {
     const res = await axios.delete(`${URL}card/${card._id}`);
     setCards(res.data.Cards);
     setTasks(res.data.Tasks);
     setIsCardMenuOpen(false);
-  }
+  };
+  //-------------------------------------------------------------------------//
+
+  //Drop logic with dnd-kit
+  //-------------------------------------------------------------------------//
+  const { setNodeRef : setFirstNodeRef } = useDroppable({
+    id: card._id,
+    data: {
+      accepts : ["onCard"]
+    }
+  });
+  //-------------------------------------------------------------------------//
 
   return (
     <>
       <div
         id={card._id}
-        onDragOver={(e) => handleTaskDragOver(e)}
-        onDrop={(e) => handleTaskDrop(e)}
+        // onDragOver={(e) => handleTaskDragOver(e)}
+        // onDrop={(e) => handleTaskDrop(e)}
+        ref={setFirstNodeRef}
         className="card bg-black rounded-[12px] w-min min-w-60 h-min m-4"
       >
-        {isCardMenuOpen && <div className="absolute rounded-[8px] w-25 h-25 bg-black/70 flex justify-center ml-35 mt-9">
-          <div className="menuitem text-txtColor py-1 hover:cursor-pointer" onClick={handleCardDelete}>
-            Delete
+        {isCardMenuOpen && (
+          <div className="absolute rounded-[8px] w-25 h-25 bg-black/70 flex justify-center ml-35 mt-9">
+            <div
+              className="menuitem text-txtColor py-1 hover:cursor-pointer"
+              onClick={handleCardDelete}
+            >
+              Delete
+            </div>
           </div>
-        </div>}
+        )}
         <div className="cardHeader text-txtColor font-medium flex justify-between px-4 h-9 text-[16px] items-center">
           <input
             defaultValue={newCardName}
@@ -116,26 +134,38 @@ const Card = ({
 
         {tasks &&
           tasks
-            .filter(task => task.CardId === card._id)
+            .filter((task) => task.CardId === card._id)
             .map((task: TaskType) => {
               return (
-                <div key={task._id} className="task border-t-2 border-black">
-                  <Task
-                    key={task._id}
-                    task={task}
-                    setTasks={setTasks}
-                    taskList={tasks}
-                    setIsAddNewTask={setIsAddNewTask}
-                    isAddNewTask={isAddNewTask}
-                  />
-                </div>
+                <>
+                  <div key={task._id} className="task border-t-2 border-black">
+                    <Task
+                      key={task._id}
+                      task={task}
+                      setTasks={setTasks}
+                      taskList={tasks}
+                      setIsAddNewTask={setIsAddNewTask}
+                      isAddNewTask={isAddNewTask}
+                    />
+                  </div>
+                </>
               );
             })}
 
         {isAddNewTask && (
           <Task
             key={3423}
-            task={{ _id: "0", Task: "", CardId : card._id, isDone : false, ModifiedBy : "", CreatedBy : "", Assignee : "", updatedAt : "", createdAt : "" }}
+            task={{
+              _id: "0",
+              Task: "",
+              CardId: card._id,
+              isDone: false,
+              ModifiedBy: "",
+              CreatedBy: "",
+              Assignee: "",
+              updatedAt: "",
+              createdAt: "",
+            }}
             setTasks={setTasks}
             taskList={tasks}
             setIsAddNewTask={setIsAddNewTask}

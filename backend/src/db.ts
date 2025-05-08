@@ -60,6 +60,10 @@ const TaskSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : 'User',
         required : true
+    },
+    Order : {
+        type : Number,
+        required : true
     }
 },{
     timestamps : true

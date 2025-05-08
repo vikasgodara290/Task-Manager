@@ -3,12 +3,15 @@ import Status from "./Status";
 import EditTask from "./EditTask";
 import axios from "axios";
 import { TaskType } from "../utils/CustomDataTypes";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import DropDiv from "./DropDiv";
 const URL = import.meta.env.VITE_URL;
 
 interface TaskProps {
   task: TaskType;
   setTasks?: any;
-  taskList: TaskType [];
+  taskList: TaskType[];
   setIsAddNewTask?: any;
   isAddNewTask: boolean;
 }
@@ -37,10 +40,24 @@ export default function Task({
         setVisible(false);
       }
     };
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
   }, []);
 
+  const handleContextMenuOfTask = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setPosition({ x: e.pageX, y: e.pageY });
+    setVisible(true);
+  };
+
+  const handleTaskDelete = async () => {
+    const res = await axios.delete(`${URL}task/${task._id}`);
+    setTasks(res.data);
+  };
+  //---------------------------------------------------------------------//
+
+  //Add new task + save edited task
+  //---------------------------------------------------------------------//
   useEffect(() => {
     if (!editedTask) {
       setIsEditTask(true);
@@ -66,7 +83,7 @@ export default function Task({
         createdBy: "681611c60a4a306175553be2",
         modifiedBy: "681611c60a4a306175553be2",
       });
-      const tasks : TaskType[] = res.data;
+      const tasks: TaskType[] = res.data;
       setTasks(tasks);
       setIsAddNewTask(false);
       setIsEditTask(false);
@@ -81,17 +98,12 @@ export default function Task({
         assignee: "681611c60a4a306175553be2",
         modifiedBy: "681611c60a4a306175553be2",
       });
-      const editedTask : TaskType = res.data;
+      const editedTask: TaskType = res.data;
 
       setEditedTask(editedTask.Task);
       setIsEditTask(false);
       setIsAddNewTask(false);
     }
-  };
-
-  const handleTaskDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData("text/plain", (e.target as HTMLDivElement)?.id);
-    setIsTaskDragged(true);
   };
 
   let taskStyle = isChecked ? "pr-1" : "pr-5";
@@ -103,6 +115,14 @@ export default function Task({
       editTaskRef.current.setSelectionRange(length, length);
     }
   }, [isEditTask]);
+  //---------------------------------------------------------------------//
+
+  //Drag and drop event handle
+  //---------------------------------------------------------------------//
+  const handleTaskDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    e.dataTransfer.setData("text/plain", (e.target as HTMLDivElement)?.id);
+    setIsTaskDragged(true);
+  };
 
   const handleOnTaskDragOver = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -131,20 +151,35 @@ export default function Task({
     setTasks(res.data);
     setIsTaskDragged(false);
   };
+  //---------------------------------------------------------------------//
 
-  const handleContextMenuOfTask = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setPosition({ x: e.pageX, y: e.pageY });
-    setVisible(true);
+  //DnD using dnd-kit
+  //---------------------------------------------------------------------//
+  const { attributes, listeners, transform, setNodeRef } = useDraggable({
+    id: task._id,
+    data : {
+      type : "onCard"
+    }
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
   };
 
-  const handleTaskDelete = async () => {
-    const res = await axios.delete(`${URL}task/${task._id}`) 
-    setTasks(res.data)
-  }
+  const {setNodeRef : setsecondNodeRef} = useDroppable({
+    id : task._id,
+    data : {
+      accepts : ["onTask"]
+    }
+  })
+
+  //---------------------------------------------------------------------//
 
   return (
     <>
+      {/* {<div className="flex justify-center" ref={setsecondNodeRef}>
+        <DropDiv height="min-h-9" />
+      </div>} */}
       <div
         draggable
         id={task._id}
@@ -155,11 +190,18 @@ export default function Task({
         } ${
           !isTaskDragged && "hover:border-blue-300"
         } items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-0.5`}
-        onDragStart={(e) => handleTaskDragStart(e)}
-        onDragOver={(e) => handleOnTaskDragOver(e)}
-        onDragLeave={(e) => handleOnTaskDragLeave(e)}
-        onDrop={(e) => handleTaskDropOnTask(e)}
-        onContextMenu={(e) => handleContextMenuOfTask(e)}
+        // onDragStart={(e) => handleTaskDragStart(e)}
+        // onDragOver={(e) => handleOnTaskDragOver(e)}
+        // onDragLeave={(e) => handleOnTaskDragLeave(e)}
+        // onDrop={(e) => handleTaskDropOnTask(e)}
+        // onContextMenu={(e) => handleContextMenuOfTask(e)}
+        {...listeners}
+        {...attributes}
+        style={style}
+        ref={(node) => {
+          setNodeRef(node);
+          setsecondNodeRef(node);
+        }}
       >
         <span className="mt-2.5 mx-1 shrink-0">
           <Status
@@ -204,25 +246,25 @@ export default function Task({
           )}
         </div>
 
-        <div >
-        {visible && (
-          <div
-            ref={menuRef}
-            style={{
-              position: "absolute",
-              top: position.y,
-              left: position.x,
-              boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
-              borderRadius: "4px",
-              zIndex: 1000,
-            }}
-            className="py-2 px-10 bg-black/70 text-txtColor hover:cursor-pointer"
-            onClick={handleTaskDelete}
-          >
-            delete
-          </div>
-        )}
-      </div>
+        <div>
+          {visible && (
+            <div
+              ref={menuRef}
+              style={{
+                position: "absolute",
+                top: position.y,
+                left: position.x,
+                boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                borderRadius: "4px",
+                zIndex: 1000,
+              }}
+              className="py-2 px-10 bg-black/70 text-txtColor hover:cursor-pointer"
+              onClick={handleTaskDelete}
+            >
+              delete
+            </div>
+          )}
+        </div>
 
         {!isAddNewTask && (
           <span className="ml-auto mx-1 mt-2">
