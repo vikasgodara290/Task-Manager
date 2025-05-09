@@ -13,9 +13,10 @@ interface CardProps {
   tasks: TaskType[];
   setTasks: React.Dispatch<React.SetStateAction<any>>;
   setCards: React.Dispatch<React.SetStateAction<any>>;
+  isTaskDragOvered : string | null
 }
 
-const Card = ({ tasks, setTasks, card, setCards }: CardProps) => {
+const Card = ({ tasks, setTasks, card, setCards, isTaskDragOvered }: CardProps) => {
   const [isAddNewTask, setIsAddNewTask] = useState<boolean>(false);
   const [isCardMenuOpen, setIsCardMenuOpen] = useState<boolean>(false);
   const [newCardName, setNewCardName] = useState<string>(card.CardName);
@@ -107,7 +108,11 @@ const Card = ({ tasks, setTasks, card, setCards }: CardProps) => {
         // onDragOver={(e) => handleTaskDragOver(e)}
         // onDrop={(e) => handleTaskDrop(e)}
         ref={setFirstNodeRef}
-        className="card bg-black rounded-[12px] w-min min-w-60 h-min m-4"
+        className={`card bg-black rounded-[12px] w-min min-w-60 h-min m-4 ${
+          (isTaskDragOvered === card._id)
+            ? " border-2 border-blue-300 "
+            : " border-2 border-black "
+        }` }
       >
         {isCardMenuOpen && (
           <div className="absolute rounded-[8px] w-25 h-25 bg-black/70 flex justify-center ml-35 mt-9">
@@ -146,6 +151,7 @@ const Card = ({ tasks, setTasks, card, setCards }: CardProps) => {
                       taskList={tasks}
                       setIsAddNewTask={setIsAddNewTask}
                       isAddNewTask={isAddNewTask}
+                      isTaskDragOvered = {isTaskDragOvered}
                     />
                   </div>
                 </>

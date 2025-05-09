@@ -4,7 +4,7 @@ import EditTask from "./EditTask";
 import axios from "axios";
 import { TaskType } from "../utils/CustomDataTypes";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
+import { CSS, useEvent } from "@dnd-kit/utilities";
 import DropDiv from "./DropDiv";
 const URL = import.meta.env.VITE_URL;
 
@@ -14,18 +14,19 @@ interface TaskProps {
   taskList: TaskType[];
   setIsAddNewTask?: any;
   isAddNewTask: boolean;
+  isTaskDragOvered? : string | null;
 }
 export default function Task({
   task,
   setTasks,
   setIsAddNewTask,
   isAddNewTask,
+  isTaskDragOvered
 }: TaskProps) {
   const editTaskRef = useRef<HTMLTextAreaElement | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(task.isDone);
   const [isEditTask, setIsEditTask] = useState<boolean>(false);
   const [editedTask, setEditedTask] = useState<string>(task.Task);
-  const [isTaskDragOvered, setIsTaskDragOvered] = useState<boolean>(false);
   const [isTaskDragged, setIsTaskDragged] = useState<boolean>(false);
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -127,7 +128,7 @@ export default function Task({
   const handleOnTaskDragOver = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
-      setIsTaskDragOvered(true);
+      //setIsTaskDragOvered(true);
     },
     []
   );
@@ -135,14 +136,14 @@ export default function Task({
   const handleOnTaskDragLeave = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
-      setIsTaskDragOvered(false);
+      //setIsTaskDragOvered(false);
     },
     []
   );
 
   const handleTaskDropOnTask = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    setIsTaskDragOvered(false);
+    //setIsTaskDragOvered(false);
 
     const res = await axios.put(`${URL}reorder`, {
       droppedId: e.dataTransfer.getData("text/plain"),
@@ -186,10 +187,10 @@ export default function Task({
         }
       : {};
 
-  useEffect(() => {
-    console.log("there is a change in editedTask : ", isEditTask);
-    
-  }, [isEditTask])
+  useEffect(()=> {
+    console.log(isTaskDragOvered);
+
+  },[isTaskDragOvered])
 
   //---------------------------------------------------------------------//
 
@@ -202,11 +203,11 @@ export default function Task({
         //draggable
         id={task._id}
         className={`flex ${
-          isTaskDragOvered
+          (isTaskDragOvered === task._id)
             ? " border-t-2 border-blue-300 "
-            : " border-2 border-black "
+            : " border-t-2 border-black "
         } ${
-          !isTaskDragged && "hover:border-blue-300"
+          isTaskDragged && "hover:border-blue-300"
         } items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-0.5`}
         // onDragStart={(e) => handleTaskDragStart(e)}
         // onDragOver={(e) => handleOnTaskDragOver(e)}

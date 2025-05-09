@@ -10,6 +10,7 @@ const URL = import.meta.env.VITE_URL;
 function App() {
   const [cards, setCards] = useState<CardType[]>([]);
   const [tasks, setTasks] = useState<TaskType[]>([]);
+  const [isTaskDragOvered, setIsTaskDragOvered] = useState<string | null>(null);
 
   //Get all tasks from backend
   //-------------------------------------------------------------------------//
@@ -42,7 +43,7 @@ function App() {
   const handleOnTaskDragEnd = async (e : DragEndEvent) => {
     const {active, over} = e; 
     console.log('from task', active.id, over?.data, over?.data.current?.accepts);
-
+    setIsTaskDragOvered(null)
     if(over?.data.current?.accepts[0] === "onTask"){
       const res = await axios.put(`${URL}reorder`, {
         droppedId: active.id,
@@ -65,7 +66,9 @@ function App() {
   const handleTaskDragOver = async (e : DragOverEvent) => {
     const {over, active} = e;
     console.log('from drag over', active.id, over?.id);
-    
+    if(over){
+      setIsTaskDragOvered( String ( over?.id ))
+    }
   }
   //-------------------------------------------------------------------------//
 
@@ -83,6 +86,7 @@ function App() {
                   setTasks={setTasks}
                   card={card}
                   setCards={setCards}
+                  isTaskDragOvered={isTaskDragOvered}
                 />
               );
             })}
