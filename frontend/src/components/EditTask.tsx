@@ -13,11 +13,16 @@ const EditTask = ({ setIsEditTask }: EditTaskProps) => {
     setIsEditTask(true);
   };
 
+  const handlePointerDown = (e : React.PointerEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+  }
+
   return (
     <>
       <div
         className="text-[18px] hover:cursor-pointer"
         onClick={handleEditTask}
+        onPointerDown={(e) => handlePointerDown(e)}
       >
         <CiEdit />
       </div>

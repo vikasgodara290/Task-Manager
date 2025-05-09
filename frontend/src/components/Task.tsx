@@ -157,21 +157,39 @@ export default function Task({
   //---------------------------------------------------------------------//
   const { attributes, listeners, transform, setNodeRef } = useDraggable({
     id: task._id,
-    data : {
-      type : "onCard"
-    }
+    data: {
+      type: "onCard",
+    },
   });
 
   const style = {
     transform: CSS.Translate.toString(transform),
   };
 
-  const {setNodeRef : setsecondNodeRef} = useDroppable({
-    id : task._id,
-    data : {
-      accepts : ["onTask"]
-    }
-  })
+  const { setNodeRef: setsecondNodeRef } = useDroppable({
+    id: task._id,
+    data: {
+      accepts: ["onTask"],
+    },
+  });
+
+  const conditionalProps =
+    !isAddNewTask && !isEditTask
+      ? {
+          ...listeners,
+          ...attributes,
+          style,
+          ref: (node: HTMLElement | null) => {
+            setNodeRef(node);
+            setsecondNodeRef(node);
+          },
+        }
+      : {};
+
+  useEffect(() => {
+    console.log("there is a change in editedTask : ", isEditTask);
+    
+  }, [isEditTask])
 
   //---------------------------------------------------------------------//
 
@@ -181,7 +199,7 @@ export default function Task({
         <DropDiv height="min-h-9" />
       </div>} */}
       <div
-        draggable
+        //draggable
         id={task._id}
         className={`flex ${
           isTaskDragOvered
@@ -195,13 +213,7 @@ export default function Task({
         // onDragLeave={(e) => handleOnTaskDragLeave(e)}
         // onDrop={(e) => handleTaskDropOnTask(e)}
         // onContextMenu={(e) => handleContextMenuOfTask(e)}
-        {...listeners}
-        {...attributes}
-        style={style}
-        ref={(node) => {
-          setNodeRef(node);
-          setsecondNodeRef(node);
-        }}
+        {...conditionalProps}
       >
         <span className="mt-2.5 mx-1 shrink-0">
           <Status

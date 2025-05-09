@@ -12,7 +12,7 @@ dbConnect();
 
 //Return : All tasks
 app.get("/task", async (req, res) => {
-  const tasks = await TaskModel.find()
+  const tasks = await TaskModel.find().sort({Order : 1})
   tasks.forEach((e, index) => {
     console.log(e, index);
   });
@@ -29,7 +29,8 @@ app.get("/taskById/:id", async (req, res) => {
 //Return : all tasks with new one added
 app.post("/task", async (req, res) => {
   const { task, cardId, isDone, assignee, createdBy, modifiedBy} = req.body;
-
+  const taskByCard = await TaskModel.find({CardId : cardId})
+  const order = taskByCard.length + 1;
   await TaskModel.create({
     Task: task,
     CardId: cardId,
@@ -37,9 +38,10 @@ app.post("/task", async (req, res) => {
     Assignee: assignee,
     CreatedBy: createdBy,
     ModifiedBy: modifiedBy,
+    Order : order
   })
 
-  const tasks = await TaskModel.find()
+  const tasks = await TaskModel.find().sort({Order : 1})
   res.status(201).json(tasks);
 });
 
@@ -76,6 +78,11 @@ app.delete("/card/:cardId", async (req, res) => {
 //Return : Updated Task
 app.put("/task", async (req, res) => {
   const { id, task, cardId, isDone, assignee, modifiedBy } = req.body;
+
+  if(id === "0"){
+    res.status(200).send("it is a new task");
+    return;
+  }
   
   await TaskModel.updateOne({_id : id}, {
     Task : task,
@@ -91,40 +98,49 @@ app.put("/task", async (req, res) => {
 //Return : updated task
 app.put("/reposition", async (req, res) => {
   const { id, cardId, modifiedBy } = req.body;
-
+  const tasksByCard = await TaskModel.find({CardId : cardId}).sort({Order : 1});
   await TaskModel.updateOne({_id : id}, {
     CardId : cardId,
-    ModifiedBy : modifiedBy
+    ModifiedBy : modifiedBy,
+    Order : tasksByCard.length + 1
   })
-  const tasks = await TaskModel.find();
+  const tasks = await TaskModel.find().sort({Order : 1});
   res.status(200).json(tasks);
 });
 
 app.put("/reorder", async (req, res) => {
   const droppedId  : mongoose.Types.ObjectId = req.body.droppedId;
   const droppedOnId : mongoose.Types.ObjectId = req.body.droppedOnId;
-
-  const tasks = await TaskModel.find() 
  
-  const taskDroppedOnIndex = tasks.findIndex((task) => task._id.equals( droppedOnId ));
-  const taskDroppedIndex = tasks.findIndex((task) => task._id.equals( droppedId ));
+  const droppedOnTask = await TaskModel.findById(droppedOnId);
   
-  if (taskDroppedOnIndex === -1) {
+  if (!droppedOnTask) {
     // If the task is not found, return a 404 error
     res.status(404).json({ message: `Task with id ${droppedOnId} not found.` });
     return;
   }
 
-  const droppedOnTask = await TaskModel.findOne({_id : droppedOnId})
   const cardId = droppedOnTask?.CardId;
+  const order = droppedOnTask?.Order;
+  
+    // 1) Shift everything at or after insertOrder up by 1
+    await TaskModel.updateMany(
+      { Order: { $gte: order } },
+      { $inc: { Order: 1 } }
+    );
+  
+    // 2) Give the dragged task the new slot
+    await TaskModel.updateOne(
+      { _id: droppedId },
+      { CardId : cardId, Order: order }
+    );
+  
 
-  // Update the task properties
-  await TaskModel.updateOne({_id : droppedId}, {
-    CardId : cardId
+  await TaskModel.updateOne({_id : droppedOnId}, {
+    Order : order + 1
   })
 
-  const [item] = tasks.splice(taskDroppedIndex, 1);
-  tasks.splice(taskDroppedOnIndex , 0, item);
+  const tasks = await TaskModel.find().sort({Order : 1})
   
   res.status(200).json(tasks);
 });
