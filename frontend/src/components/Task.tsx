@@ -1,11 +1,10 @@
-import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Status from "./Status";
 import EditTask from "./EditTask";
 import axios from "axios";
 import { TaskType } from "../utils/CustomDataTypes";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { CSS, useEvent } from "@dnd-kit/utilities";
-import DropDiv from "./DropDiv";
+import { CSS } from "@dnd-kit/utilities";
 const URL = import.meta.env.VITE_URL;
 
 interface TaskProps {
@@ -116,42 +115,6 @@ export default function Task({
       editTaskRef.current.setSelectionRange(length, length);
     }
   }, [isEditTask]);
-  //---------------------------------------------------------------------//
-
-  //Drag and drop event handle
-  //---------------------------------------------------------------------//
-  const handleTaskDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData("text/plain", (e.target as HTMLDivElement)?.id);
-    setIsTaskDragged(true);
-  };
-
-  const handleOnTaskDragOver = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      //setIsTaskDragOvered(true);
-    },
-    []
-  );
-
-  const handleOnTaskDragLeave = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      //setIsTaskDragOvered(false);
-    },
-    []
-  );
-
-  const handleTaskDropOnTask = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    //setIsTaskDragOvered(false);
-
-    const res = await axios.put(`${URL}reorder`, {
-      droppedId: e.dataTransfer.getData("text/plain"),
-      droppedOnId: e.currentTarget.id,
-    });
-    setTasks(res.data);
-    setIsTaskDragged(false);
-  };
   //---------------------------------------------------------------------//
 
   //DnD using dnd-kit

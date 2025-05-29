@@ -5,7 +5,6 @@ import axios from "axios";
 import { BsThreeDots } from "react-icons/bs";
 import { CardType, TaskType } from "../utils/CustomDataTypes";
 import { useDroppable } from "@dnd-kit/core";
-import DropDiv from "./DropDiv";
 const URL = import.meta.env.VITE_URL;
 
 interface CardProps {
@@ -21,8 +20,6 @@ const Card = ({ tasks, setTasks, card, setCards, isTaskDragOvered }: CardProps) 
   const [isCardMenuOpen, setIsCardMenuOpen] = useState<boolean>(false);
   const [newCardName, setNewCardName] = useState<string>(card.CardName);
   const cardNameRef = useRef<HTMLInputElement | null>(null);
-
-  let isCard = false;
 
   //Saving Card Name
   //-------------------------------------------------------------------------//
@@ -42,37 +39,6 @@ const Card = ({ tasks, setTasks, card, setCards, isTaskDragOvered }: CardProps) 
     if (cardNameRef.current) {
       saveInput(cardNameRef.current?.value);
       setNewCardName(cardNameRef.current?.value);
-    }
-  };
-  //-------------------------------------------------------------------------//
-
-  //Task Drop handle
-  //-------------------------------------------------------------------------//
-  const handleTaskDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
-  const handleTaskDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    let cardEl = e.currentTarget as HTMLElement;
-
-    while (!isCard) {
-      if (
-        cardEl.className.includes("card") &&
-        e.dataTransfer.getData("text/plain")
-      ) {
-        console.log(cardEl.id);
-        isCard = true;
-        const res = await axios.put(`${URL}reposition`, {
-          id: e.dataTransfer.getData("text/plain"),
-          cardId: cardEl.id,
-        });
-        if (res) {
-          const tasks: TaskType[] = res.data;
-          setTasks(tasks);
-        }
-      } else {
-        cardEl = cardEl.parentElement as HTMLElement;
-      }
     }
   };
   //-------------------------------------------------------------------------//
