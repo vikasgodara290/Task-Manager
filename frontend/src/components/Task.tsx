@@ -172,11 +172,6 @@ export default function Task({
         } ${
           isTaskDragged && "hover:border-blue-300"
         } items-start group bg-taskBgColor font-normal h-min min-h-9 w-11/12 rounded-[8px] text-txtColor mx-auto my-0.5`}
-        // onDragStart={(e) => handleTaskDragStart(e)}
-        // onDragOver={(e) => handleOnTaskDragOver(e)}
-        // onDragLeave={(e) => handleOnTaskDragLeave(e)}
-        // onDrop={(e) => handleTaskDropOnTask(e)}
-        // onContextMenu={(e) => handleContextMenuOfTask(e)}
         {...conditionalProps}
       >
         <span className="mt-2.5 mx-1 shrink-0">

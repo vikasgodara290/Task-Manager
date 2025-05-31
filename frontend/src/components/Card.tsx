@@ -71,8 +71,6 @@ const Card = ({ tasks, setTasks, card, setCards, isTaskDragOvered }: CardProps) 
     <>
       <div
         id={card._id}
-        // onDragOver={(e) => handleTaskDragOver(e)}
-        // onDrop={(e) => handleTaskDrop(e)}
         ref={setFirstNodeRef}
         className={`card bg-black rounded-[12px] w-min min-w-60 h-min m-4 ${
           (isTaskDragOvered === card._id)
