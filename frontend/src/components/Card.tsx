@@ -49,7 +49,7 @@ const Card = ({ tasks, setTasks, card, setCards, isTaskDragOvered }: CardProps) 
     isCardMenuOpen ? setIsCardMenuOpen(false) : setIsCardMenuOpen(true);
   };
 
-  const handleCardDelete = async () => {
+  const handleCardDelete = async (e : React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const res = await axios.delete(`${URL}card/${card._id}`);
     setCards(res.data.Cards);
     setTasks(res.data.Tasks);
@@ -66,7 +66,6 @@ const Card = ({ tasks, setTasks, card, setCards, isTaskDragOvered }: CardProps) 
     }
   });
   //-------------------------------------------------------------------------//
-
   return (
     <>
       <div
@@ -82,7 +81,7 @@ const Card = ({ tasks, setTasks, card, setCards, isTaskDragOvered }: CardProps) 
           <div className="absolute rounded-[8px] w-25 h-25 bg-black/70 flex justify-center ml-35 mt-9">
             <div
               className="menuitem text-txtColor py-1 hover:cursor-pointer"
-              onClick={handleCardDelete}
+              onClick={e => handleCardDelete(e)}
             >
               Delete
             </div>
