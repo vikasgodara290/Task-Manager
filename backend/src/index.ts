@@ -10,6 +10,34 @@ app.use(express.json());
 app.use(cors());
 dbConnect();
 
+// sign up endpoint 
+app.post("/signup", async (req, res) => {
+  const { username, password } = req.body;
+  const user = await UserModel.findOne({ username });
+  if (user) {
+    res.status(400).json({ message: "User already exists" });
+    return;
+  }        
+  const newUser = await UserModel.create({
+    username,
+    password,
+    userId: uuidv4(),
+  });
+  res.status(201).json(newUser);
+});
+
+// login endpoint
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  const user = await UserModel.find({ username, password });
+  if (user.length === 0) {
+    res.status(400).json({ message: "Invalid username or password" });
+    return;
+  }
+  res.status(200).json(user[0]);
+});
+
+
 //Return : All tasks
 app.get("/task", async (req, res) => {
   const tasks = await TaskModel.find().sort({Order : 1})
