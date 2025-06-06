@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import AddNewTask from "./AddNewTask";
 import Task from "./Task";
 import axios from "axios";
@@ -9,17 +9,32 @@ const URL = import.meta.env.VITE_URL;
 
 interface CardProps {
   card: CardType;
-  tasks: TaskType[];
-  setTasks: React.Dispatch<React.SetStateAction<any>>;
   setCards: React.Dispatch<React.SetStateAction<any>>;
   isTaskDragOvered : string | null
 }
 
-const Card = ({ tasks, setTasks, card, setCards, isTaskDragOvered }: CardProps) => {
+const Card = ({card, setCards, isTaskDragOvered }: CardProps) => {
   const [isAddNewTask, setIsAddNewTask] = useState<boolean>(false);
   const [isCardMenuOpen, setIsCardMenuOpen] = useState<boolean>(false);
   const [newCardName, setNewCardName] = useState<string>(card.CardName);
   const cardNameRef = useRef<HTMLInputElement | null>(null);
+  const [tasks, setTasks] = useState<TaskType[]>([]);
+  // const [isTaskDragOvered, setIsTaskDragOvered] = useState<string | null>(null);
+
+  //Get all tasks from backend
+  //-------------------------------------------------------------------------//
+  useEffect(() => {
+    //func which call itself
+    //async func can't be declared inside a useEffect directly
+    (async () => {
+      const res = await axios.get(`${URL}task/${card._id}`);
+      const tasks: TaskType[] = res.data;
+      setTasks(tasks);
+      console.log(tasks);
+      
+    })();
+  }, []);
+  //-------------------------------------------------------------------------//
 
   //Saving Card Name
   //-------------------------------------------------------------------------//

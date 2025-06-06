@@ -54,6 +54,13 @@ app.get("/taskById/:id", async (req, res) => {
   res.json(taskById);
 });
 
+//Return : Task which matches id
+app.get("/taskById/:cardId", async (req, res) => {
+  const cardId = new mongoose.Types.ObjectId (req.params.cardId);
+  const tasksByCardId = await TaskModel.find({CardId : cardId})
+  res.json(tasksByCardId);
+});
+
 //Return : all tasks with new one added
 app.post("/task", async (req, res) => {
   const { task, cardId, isDone, assignee, createdBy, modifiedBy} = req.body;
